@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 
-class QuestionnaireSchema(BaseModel):
+class QuestionnaireResponseSchema(BaseModel):
     user_id: int
     question_id: str
     answer_text: str | None = None

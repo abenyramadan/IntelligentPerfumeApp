@@ -1,0 +1,92 @@
+from db.core import get_session
+from db.models import QuestionnaireResponse
+from schema.questionnaire_schema import QuestionnaireResponseSchema
+from schema.response_schema import ResponseSchema
+
+
+class QuestionnaireResponseService:
+    @classmethod
+    def create_questionnaire_response(
+        cls,
+        questionnaire_response: QuestionnaireResponseSchema,
+    ) -> QuestionnaireResponse:
+        with get_session() as session:
+            questionnaire_item = QuestionnaireResponse(**questionnaire_response.dict())
+            session.add(questionnaire_item)
+            session.commit()
+            session.refresh(questionnaire_item)
+
+            return questionnaire_item
+
+    @classmethod
+    def update_questionnaire_response(
+        cls, qr_id, questionnaire_response: QuestionnaireResponseSchema
+    ) -> QuestionnaireResponse | dict:
+        with get_session() as session:
+            db_qn_response = (
+                session.query(QuestionnaireResponse).filter_by(id=qr_id).first()
+            )
+
+            if not db_qn_response:
+                return ResponseSchema(
+                    success=False,
+                    message=f"Cannot find questionnaire response with id {qr_id}",
+                )
+
+            db_qn_response.question_id = questionnaire_response.question_id
+            db_qn_response.answer_text = questionnaire_response.answer_text
+            db_qn_response.answer_number = questionnaire_response.answer_number
+            db_qn_response.answer_json = questionnaire_response.answer_json
+            db_qn_response.user_id = questionnaire_response.user_id
+
+            session.add(db_qn_response)
+            session.commit()
+
+            return db_qn_response
+
+    @classmethod
+    def delete_questionnaire_response(cls, qr_id) -> dict:
+
+        with get_session() as session:
+            db_qn_response = (
+                session.query(QuestionnaireResponse).filter_by(id=qr_id).first()
+            )
+
+            if not db_qn_response:
+                return ResponseSchema(
+                    success=False,
+                    message=f"Cannot find quesitonnaire response with id: {qr_id}",
+                )
+
+            else:
+                session.delete(db_qn_response)
+                session.commit()
+                return ResponseSchema(
+                    success=True,
+                    message=f"Questionnaire response with id: {qr_id} deleted successfully",
+                )
+
+    @classmethod
+    def get_questionnaire_response_by_id(
+        cls, qr_id: int
+    ) -> QuestionnaireResponse | dict:
+
+        with get_session() as session:
+            db_qn_response = (
+                session.query(QuestionnaireResponse).filter_by(id=qr_id).first()
+            )
+
+            if not db_qn_response:
+                return ResponseSchema(
+                    success=False, message=f"Cannot find question with id: {qr_id}"
+                )
+
+            else:
+                return db_qn_response
+
+    @classmethod
+    def get_questionnaire_respones_all(cls) -> list[QuestionnaireResponse]:
+        with get_session() as session:
+            db_qn_responses = session.query(QuestionnaireResponse).all()
+
+            return db_qn_responses or []
