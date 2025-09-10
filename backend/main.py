@@ -5,9 +5,14 @@ from db.core import Base, db_engine
 # routers
 from routers.perfume_router import router as perfume_router
 from routers.users_router import router as user_router
-from routers.questionnaires_response_router import router as questionnaire_router
+from routers.questionnaires_response_router import (
+    router as questionnaire_response_router,
+)
 from routers.user_profiles_router import router as user_profile_router
 from routers.recommendations_router import router as recommendation_router
+from routers.questionnaire_router import router as questionnaire_router
+
+
 from db.populate_db import insert_perfumes
 
 
@@ -39,6 +44,7 @@ app = FastAPI(
 app.include_router(perfume_router)
 app.include_router(user_router)
 app.include_router(questionnaire_router)
+app.include_router(questionnaire_response_router)
 app.include_router(user_profile_router)
 app.include_router(recommendation_router)
 
