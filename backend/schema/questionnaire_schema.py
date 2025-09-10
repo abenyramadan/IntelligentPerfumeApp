@@ -1,9 +1,8 @@
 from pydantic import BaseModel
 
 
-class QuestionnaireResponseSchema(BaseModel):
-    user_id: int
-    question_id: str
-    answer_text: str | None = None
-    answer_number: float | None = None
-    answer_json: str | None = None
+class QuestionnaireSchema(BaseModel):
+    question_id: str | None = None
+    question_text: str
+    question_topic: str | None = None  # e.g skin chemistry, enviroment etx
+    multiple_choices: str

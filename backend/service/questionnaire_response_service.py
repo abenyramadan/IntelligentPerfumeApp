@@ -1,6 +1,6 @@
 from db.core import get_session
 from db.models import QuestionnaireResponse
-from schema.questionnaire_schema import QuestionnaireResponseSchema
+from schema.questionnaire_response_schema import QuestionnaireResponseSchema
 from schema.response_schema import ResponseSchema
 
 
