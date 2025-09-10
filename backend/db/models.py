@@ -81,6 +81,8 @@ class UserProfile(Base):
     time_window_end = Column(Integer, nullable=False)  # Hours
     projection_weight = Column(Float, nullable=False)  # Lambda value (0.2, 1.0, 2.0)
 
+    created_at = Column(DateTime, default=datetime.now)
+
     def __repr__(self):
         return f"<UserProfile for User {self.user_id}>"
 
@@ -129,6 +131,16 @@ class UserProfile(Base):
             "time_window_end": self.time_window_end,
             "projection_weight": self.projection_weight,
         }
+
+
+class Questionnaire(Base):
+    __tablename__ = "questionnaires"
+    id = Column(Integer, primary_key=True)
+    question_id = Column(String)
+    question_text = Column(String, nullable=False)
+    question_topic = Column(String)  # Skin Chemistry, preferences, climate etc
+    multiple_choices = Column(Text, nullable=False)  # comma seperate multiple choices
+    created_at = Column(DateTime, default=datetime.now)
 
 
 class QuestionnaireResponse(Base):
@@ -186,6 +198,8 @@ class Perfume(Base):
     allergens = Column(Text, nullable=True)
     image_url = Column(String(300), nullable=True)
 
+    created_at = Column(DateTime, nullable=True, default=datetime.now)
+
     def __repr__(self):
         return f"<Perfume {self.brand} - {self.name}>"
 
@@ -239,6 +253,8 @@ class Recommendation(Base):
     actual_sillage = Column(Integer, nullable=True)  # 1-10 scale
     user_notes = Column(Text, nullable=True)  # Free text feedback
     feedback_date = Column(DateTime, nullable=True)
+
+    created_at = Column(DateTime, default=datetime.now)
 
     def __repr__(self):
         return f"<Recommendation {self.id} for User {self.user_id}>"
