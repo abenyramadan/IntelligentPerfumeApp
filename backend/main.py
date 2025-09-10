@@ -7,6 +7,7 @@ from routers.perfume_router import router as perfume_router
 from routers.users_router import router as user_router
 from routers.questionnaires_router import router as questionnaire_router
 from routers.user_profiles_router import router as user_profile_router
+from routers.recommendations_router import router as recommendation_router
 
 
 # create lifespan to init db
@@ -38,8 +39,9 @@ app.include_router(perfume_router)
 app.include_router(user_router)
 app.include_router(questionnaire_router)
 app.include_router(user_profile_router)
+app.include_router(recommendation_router)
 
 
 @app.get("/")
 def read_home():
-    return "hello from fastapi"
+    return "hello from API"
