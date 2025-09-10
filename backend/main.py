@@ -30,8 +30,8 @@ async def lifespan(app: FastAPI):
 
 # init main app
 app = FastAPI(
-    title="Perfume Recommendation API",
-    description="Recommend perfumes based on user profile",
+    title="AI Powered Perfume Recommendation API",
+    description="Recommend perfumes based on unique user profile",
     version="1.0.0",
     contact={
         "name": "Awet Thon",
@@ -51,7 +51,11 @@ app.include_router(recommendation_router)
 
 @app.get("/")
 def read_home():
-    return "hello from API"
+    return {
+        "name": "AI Powered Perfume Recommendation API",
+        "description": "Recommend perfume based on unique user profile such as skin chemistry, mood, preferrences, budget and even environmental factors",
+        "developed_by": "Awet & Abeny",
+    }
 
 
 # populate db
