@@ -64,12 +64,20 @@ class UserService:
                 )
 
             else:
-                session.delete(db_user)
-                session.commit()
-                return ResponseSchema(
-                    success=True,
-                    message=f"User with id: {user_id} deleted successfully",
-                )
+                try:
+
+                    session.delete(db_user)
+                    session.commit()
+                    return ResponseSchema(
+                        success=True,
+                        message=f"User with id: {user_id} deleted successfully",
+                    )
+
+                except:
+                    return ResponseSchema(
+                        success=False,
+                        message=f"Failed to delete user with id: {user_id}",
+                    )
 
     @classmethod
     def get_user_by_id(cls, user_id: int) -> User | dict:

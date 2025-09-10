@@ -62,12 +62,20 @@ class PerfumeService:
                     success=False, message=f"Cannot find perfume with id: {perfume_id}"
                 )
             else:
-                session.delete(perfume_to_delete)
-                session.commit()
-                return ResponseSchema(
-                    success=True,
-                    message=f"Perfume with id: {perfume_id} deleted successfully",
-                )
+
+                try:
+
+                    session.delete(perfume_to_delete)
+                    session.commit()
+                    return ResponseSchema(
+                        success=True,
+                        message=f"Perfume with id: {perfume_id} deleted successfully",
+                    )
+                except:
+                    return ResponseSchema(
+                        success=False,
+                        message=f"Failed to delete perfume with id: {perfume_id}",
+                    )
 
     @classmethod
     def get_perfume_by_id(cls, perfume_id: int) -> Perfume | dict:
