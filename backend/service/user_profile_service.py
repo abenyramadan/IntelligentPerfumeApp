@@ -80,7 +80,9 @@ class UserProfileService:
 
                 session.add(db_profile)
                 session.commit()
-                return db_profile
+                return APIResponse(
+                    success=True, message="User profile updated successfully"
+                )
 
     @classmethod
     def delete_user_profile(cls, profile_id) -> dict:
@@ -110,11 +112,13 @@ class UserProfileService:
                     message=f"Cannot find user profile with id: {profile_id}",
                 )
             else:
-                return db_profile
+                return APIResponse(
+                    success=True, message="Found user", data=[db_profile.to_dict()]
+                )
 
     @classmethod
     def get_user_profile_all(cls) -> list[UserProfile]:
         with get_session() as session:
 
             db_profiles = session.query(UserProfile).all()
-            return db_profiles or []
+            return APIResponse(success=True, message="All good", data=[db_profiles])

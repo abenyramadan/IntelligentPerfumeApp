@@ -95,10 +95,13 @@ class UserService:
                     success=False, message=f"Cannot find user with id: {user_id}"
                 )
             else:
-                return db_user
+                return APIResponse(success=True, message="Found user", data=[db_user])
 
     @classmethod
     def get_users_all(cls) -> list[User]:
         with get_session() as session:
             db_users = session.query(User).all()
-            return db_users or []
+
+            if not db_users:
+                db_users = []
+            return APIResponse(success=True, message="All good", data=db_users)

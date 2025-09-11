@@ -16,7 +16,9 @@ class QuestionnaireResponseService:
             session.commit()
             session.refresh(questionnaire_item)
 
-            return questionnaire_item
+            return APIResponse(
+                success=True, message="Questionnaire response saved successfully"
+            )
 
     @classmethod
     def update_questionnaire_response(
@@ -42,7 +44,9 @@ class QuestionnaireResponseService:
             session.add(db_qn_response)
             session.commit()
 
-            return db_qn_response
+            return APIResponse(
+                success=True, message="Updated questionnaire response successfully"
+            )
 
     @classmethod
     def delete_questionnaire_response(cls, qr_id) -> dict:
@@ -82,11 +86,15 @@ class QuestionnaireResponseService:
                 )
 
             else:
-                return db_qn_response
+                return APIResponse(
+                    success=True, message="Found response", data=[db_qn_response]
+                )
 
     @classmethod
     def get_questionnaire_respones_all(cls) -> list[QuestionnaireResponse]:
         with get_session() as session:
             db_qn_responses = session.query(QuestionnaireResponse).all()
 
-            return db_qn_responses or []
+            if not db_qn_responses:
+                db_qn_responses = []
+            return APIResponse(success=True, message="All good", data=db_qn_responses)

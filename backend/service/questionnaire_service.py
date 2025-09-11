@@ -14,7 +14,7 @@ class QuestionnaireService:
             session.add(db_qn)
             session.commit()
             session.refresh(db_qn)
-            return db_qn
+            return APIResponse(success=True, message="Questionnaire saved successfully")
 
     @classmethod
     def update_questionnaire(
@@ -36,7 +36,9 @@ class QuestionnaireService:
 
                 session.add(db_qn)
                 session.commit()
-                return db_qn
+                return APIResponse(
+                    success=True, message="Questionnaire updated successfully"
+                )
 
     @classmethod
     def delete_questionnaire(cls, q_id: int):
@@ -75,10 +77,14 @@ class QuestionnaireService:
                 )
 
             else:
-                return db_qn
+                return APIResponse(
+                    success=True, message="Found questionnaire", data=[db_qn]
+                )
 
     @classmethod
     def get_questionnaires_all(cls) -> list[Questionnaire]:
         with get_session() as session:
             db_qns = session.query(Questionnaire).all()
-            return db_qns or []
+            if not db_qns:
+                db_qns = []
+            return APIResponse(success=True, message="ALl good", data=db_qns)

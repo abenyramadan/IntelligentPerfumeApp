@@ -15,7 +15,9 @@ class RecommendationService:
             session.add(db_rec)
             session.commit()
             session.refresh(db_rec)
-            return db_rec
+            return APIResponse(
+                success=True, message="Recommendation created successfully"
+            )
 
     @classmethod
     def update_recommendation(
@@ -54,7 +56,9 @@ class RecommendationService:
                 db_rec.user_notes = recommendation.user_notes
                 db_rec.feedback_date = recommendation.feedback_date
 
-                return db_rec
+                return APIResponse(
+                    success=True, message="Recommendation updated successfully"
+                )
 
     @classmethod
     def delete_recommendation(cls, rec_id: int) -> dict:
@@ -84,10 +88,14 @@ class RecommendationService:
                     message=f"Cannot find recommendation with id: {rec_id}",
                 )
             else:
-                return db_rec
+                return APIResponse(
+                    success=True, message="Found recommendaiton", data=[db_rec]
+                )
 
     @classmethod
     def get_recommendation_all(cls) -> list[Recommendation]:
         with get_session() as session:
             db_recs = session.query(Recommendation).all()
-            return db_recs or []
+            if not db_recs:
+                db_recs = []
+            return APIResponse(success=True, message="All good", data=db_recs)

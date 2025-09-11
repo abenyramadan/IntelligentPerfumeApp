@@ -12,7 +12,7 @@ class PerfumeService:
             session.add(perfume_item)
             session.commit()
             session.refresh(perfume_item)
-            return perfume_item
+            return APIResponse(success=True, message=f"Created perfume successfully")
 
     @classmethod
     def update_perfume(cls, perfume_id: int, perfume: PerfumeSchema) -> dict:
@@ -85,11 +85,11 @@ class PerfumeService:
                 return APIResponse(
                     success=False, message=f"Cannot find perfume with id: {perfume_id}"
                 )
-            return perfume
+            return APIResponse(success=True, message="Found perfume", data=[perfume])
 
     @classmethod
     def get_perfume_all(cls):
         with get_session() as session:
 
             perfumes = session.query(Perfume).all()
-            return perfumes or []
+            return APIResponse(success=True, message="All good", data=perfumes)
