@@ -28,6 +28,7 @@ class RecommendationService:
 
             if not db_rec:
                 return APIResponse(
+                    status_code=404,
                     success=False,
                     message=f"Cannot find recommendation with id: {rec_id}",
                 )
@@ -67,16 +68,25 @@ class RecommendationService:
 
             if not db_rec:
                 return APIResponse(
+                    status_code=404,
                     success=False,
                     message=f"Cannot find recommendaiton with id: {rec_id}",
                 )
             else:
-                session.delete(db_rec)
-                session.commit()
-                return APIResponse(
-                    success=True,
-                    message=f"Recommendation with id: {rec_id} deleted successfully",
-                )
+                try:
+
+                    session.delete(db_rec)
+                    session.commit()
+                    return APIResponse(
+                        success=True,
+                        message=f"Recommendation with id: {rec_id} deleted successfully",
+                    )
+                except:
+                    return APIResponse(
+                        status_code=500,
+                        success=False,
+                        message="Failed to delete recommendation",
+                    )
 
     @classmethod
     def get_recommendation_by_id(cls, rec_id: int) -> Recommendation | dict:
@@ -84,6 +94,7 @@ class RecommendationService:
             db_rec = session.query(Recommendation).filter_by(id=rec_id).first()
             if not db_rec:
                 return APIResponse(
+                    status_code=404,
                     success=False,
                     message=f"Cannot find recommendation with id: {rec_id}",
                 )

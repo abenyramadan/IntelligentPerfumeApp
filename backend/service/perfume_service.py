@@ -21,7 +21,11 @@ class PerfumeService:
             perfume_to_update = session.query(Perfume).filter_by(id=perfume_id).first()
 
             if not perfume_to_update:
-                return APIResponse(False, f"Cannot find perfume with id: {perfume_id}")
+                return APIResponse(
+                    status_code=404,
+                    success=False,
+                    message=f"Cannot find perfume with id: {perfume_id}",
+                )
 
             else:
                 perfume_to_update.name = perfume.name
@@ -57,7 +61,9 @@ class PerfumeService:
 
             if not perfume_to_delete:
                 return APIResponse(
-                    success=False, message=f"Cannot find perfume with id: {perfume_id}"
+                    status_code=404,
+                    success=False,
+                    message=f"Cannot find perfume with id: {perfume_id}",
                 )
             else:
 
@@ -71,6 +77,7 @@ class PerfumeService:
                     )
                 except:
                     return APIResponse(
+                        status_code=500,
                         success=False,
                         message=f"Failed to delete perfume with id: {perfume_id}",
                     )
@@ -83,7 +90,9 @@ class PerfumeService:
 
             if not perfume:
                 return APIResponse(
-                    success=False, message=f"Cannot find perfume with id: {perfume_id}"
+                    status_code=404,
+                    success=False,
+                    message=f"Cannot find perfume with id: {perfume_id}",
                 )
             return APIResponse(success=True, message="Found perfume", data=[perfume])
 

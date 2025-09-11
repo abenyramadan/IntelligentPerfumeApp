@@ -41,7 +41,9 @@ class UserProfileService:
 
             if not db_profile:
                 return APIResponse(
-                    success=False, message=f"Cannot find profile with id: {profile_id}"
+                    status_code=404,
+                    success=False,
+                    message=f"Cannot find profile with id: {profile_id}",
                 )
             else:
                 db_profile.user_id = profile.user_id
@@ -91,7 +93,9 @@ class UserProfileService:
 
             if not db_profile:
                 return APIResponse(
-                    success=False, message=f"Cannot find profile with id: {profile_id}"
+                    status_code=404,
+                    success=False,
+                    message=f"Cannot find profile with id: {profile_id}",
                 )
 
             else:
@@ -108,6 +112,7 @@ class UserProfileService:
             db_profile = session.query(UserProfile).filter_by(id=profile_id).first()
             if not db_profile:
                 return APIResponse(
+                    status_code=404,
                     success=False,
                     message=f"Cannot find user profile with id: {profile_id}",
                 )

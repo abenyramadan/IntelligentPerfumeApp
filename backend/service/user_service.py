@@ -44,7 +44,9 @@ class UserService:
             # check if user with given id exists
             if not db_user:
                 return APIResponse(
-                    success=False, message=f"Cannot find user with id: {user_id}"
+                    status_code=404,
+                    success=False,
+                    message=f"Cannot find user with id: {user_id}",
                 )
             else:
                 db_user.username = user.name
@@ -65,7 +67,9 @@ class UserService:
 
             if not db_user:
                 return APIResponse(
-                    success=False, message=f"Cannot find user with id: {user_id}"
+                    status_code=404,
+                    success=False,
+                    message=f"Cannot find user with id: {user_id}",
                 )
 
             else:
@@ -78,8 +82,10 @@ class UserService:
                         message=f"User with id: {user_id} deleted successfully",
                     )
 
-                except:
+                except Exception as e:
+                    print("Something went wrong", e)
                     return APIResponse(
+                        status_code=500,
                         success=False,
                         message=f"Failed to delete user with id: {user_id}",
                     )
@@ -92,7 +98,9 @@ class UserService:
 
             if not db_user:
                 return APIResponse(
-                    success=False, message=f"Cannot find user with id: {user_id}"
+                    status_code=404,
+                    success=False,
+                    message=f"Cannot find user with id: {user_id}",
                 )
             else:
                 return APIResponse(success=True, message="Found user", data=[db_user])

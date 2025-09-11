@@ -31,6 +31,7 @@ class QuestionnaireResponseService:
 
             if not db_qn_response:
                 return APIResponse(
+                    status_code=404,
                     success=False,
                     message=f"Cannot find questionnaire response with id {qr_id}",
                 )
@@ -58,6 +59,7 @@ class QuestionnaireResponseService:
 
             if not db_qn_response:
                 return APIResponse(
+                    status_code=404,
                     success=False,
                     message=f"Cannot find quesitonnaire response with id: {qr_id}",
                 )
@@ -82,7 +84,9 @@ class QuestionnaireResponseService:
 
             if not db_qn_response:
                 return APIResponse(
-                    success=False, message=f"Cannot find question with id: {qr_id}"
+                    status_code=404,
+                    success=False,
+                    message=f"Cannot find question with id: {qr_id}",
                 )
 
             else:

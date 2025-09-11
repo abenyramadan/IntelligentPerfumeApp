@@ -25,7 +25,9 @@ class QuestionnaireService:
 
             if not db_qn:
                 return APIResponse(
-                    success=False, message=f"Cannot find questionnaire with id: {qn_id}"
+                    status_code=404,
+                    success=False,
+                    message=f"Cannot find questionnaire with id: {qn_id}",
                 )
 
             else:
@@ -47,13 +49,14 @@ class QuestionnaireService:
 
             if not db_qn:
                 return APIResponse(
-                    success=False, message=f"Cannot find questionnaire with id: {q_id}"
+                    status_code=404,
+                    success=False,
+                    message=f"Cannot find questionnaire with id: {q_id}",
                 )
 
             else:
 
                 try:
-
                     session.delete(db_qn)
                     session.commit()
                     return APIResponse(
@@ -62,6 +65,7 @@ class QuestionnaireService:
                     )
                 except:
                     return APIResponse(
+                        status_code=500,
                         success=False,
                         message=f"Failed to delete questionnaire with id: {q_id}",
                     )
@@ -73,7 +77,9 @@ class QuestionnaireService:
 
             if not db_qn:
                 return APIResponse(
-                    success=False, message=f"Cannot find quesitonnaire with id: {q_id}"
+                    status_code=404,
+                    success=False,
+                    message=f"Cannot find quesitonnaire with id: {q_id}",
                 )
 
             else:
