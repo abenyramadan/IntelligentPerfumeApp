@@ -30,7 +30,10 @@ class UserService:
                 new_user.password = HashService.hash_password(new_user.password)
                 session.add(new_user)
                 session.commit()
-                return new_user
+                return ResponseSchema(
+                    success=True,
+                    message=f"User with username: {user.username} created successfully",
+                )
 
     @classmethod
     def update_user(cls, user_id: int, user: UserSchema) -> User | dict:
@@ -50,7 +53,9 @@ class UserService:
 
                 session.add(db_user)
                 session.commit()
-                return db_user
+                return ResponseSchema(
+                    success=True, message=f"User detail updated successfully"
+                )
 
     @classmethod
     def delete_user(cls, user_id: int) -> dict:

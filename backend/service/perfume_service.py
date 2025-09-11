@@ -87,6 +87,7 @@ class PerfumeService:
                 return ResponseSchema(
                     success=False, message=f"Cannot find perfume with id: {perfume_id}"
                 )
+            return perfume
 
     @classmethod
     def get_perfume_all(cls):

@@ -1,4 +1,13 @@
-from sqlalchemy import String, Integer, ForeignKey, Column, DateTime, Float, Text
+from sqlalchemy import (
+    String,
+    Integer,
+    ForeignKey,
+    Column,
+    DateTime,
+    Float,
+    Text,
+    Boolean,
+)
 
 
 from .core import Base
@@ -288,3 +297,15 @@ class Recommendation(Base):
                 self.feedback_date.isoformat() if self.feedback_date else None
             ),
         }
+
+
+class AuthToken(Base):
+    __tablename__ = "auth_tokens"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    token = Column(String(150), unique=True, nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    type = Column(String(50), default="access_token")
+    is_deleted = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.now)
+    updated_at = Column(DateTime, nullable=True)
+    expires_at = Column(DateTime, nullable=True)
