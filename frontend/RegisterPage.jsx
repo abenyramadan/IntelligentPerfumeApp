@@ -47,6 +47,7 @@ function RegisterPage({ onPageChange, onRegister }) {
       });
 
       if (response?.success) {
+        //user created successfully, so make login request in the background
         const userObj = {
           user_id: response.data[0]?.user_id,
           token: response.data[0]?.token,
@@ -54,10 +55,27 @@ function RegisterPage({ onPageChange, onRegister }) {
           username: formData.username,
         };
 
-        localStorage.setItem("user", JSON.stringify(userObj));
-        onLogin(userObj);
-        toast.success("Login successful!");
-        onPageChange("home");
+        // secret login request
+        const loginRes = ApiService.login({
+          username: formData.username,
+          password: formData.password,
+        });
+
+        // if login req is succesful
+        if (loginRes?.success) {
+          const userObj = {
+            user_id: response.data[0]?.user_id,
+            token: response.data[0]?.token,
+            token_type: response.data[0]?.type,
+            username: formData.username,
+          };
+
+          localStorage.setItem("user", JSON.stringify(userObj));
+          toast.success("Login successful!");
+          onPageChange("home");
+        }
+
+        onRegister(userObj);
       } else {
         toast.error(
           response?.message || "Failed to create account. please try again"
