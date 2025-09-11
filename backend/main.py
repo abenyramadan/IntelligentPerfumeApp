@@ -12,6 +12,7 @@ from routers.user_profiles_router import router as user_profile_router
 from routers.recommendations_router import router as recommendation_router
 from routers.questionnaire_router import router as questionnaire_router
 from routers.auth_router import router as auth_router
+from routers.log_router import router as log_router
 
 from db.populate_db import insert_perfumes
 
@@ -48,6 +49,7 @@ app.include_router(questionnaire_response_router)
 app.include_router(user_profile_router)
 app.include_router(recommendation_router)
 app.include_router(auth_router)
+app.include_router(log_router)
 
 
 @app.get("/")

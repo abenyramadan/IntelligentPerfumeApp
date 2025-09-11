@@ -10,7 +10,6 @@ class LogService:
         with get_session() as session:
 
             try:
-
                 log_item = Log(**_log.dict())
                 session.add(log_item)
                 session.commit()
@@ -25,7 +24,7 @@ class LogService:
         with get_session() as session:
             db_log = session.query(Log).filter_by(id=log_id).first()
 
-            if not log_id:
+            if not db_log:
                 return APIResponse(
                     status_code=404,
                     success=False,

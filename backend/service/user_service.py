@@ -3,7 +3,6 @@ from db.models import User
 from sqlalchemy import or_
 from schema.response_schema import APIResponse
 from schema.user_schema import UserSchema
-
 from service.auth_service import HashService
 
 
