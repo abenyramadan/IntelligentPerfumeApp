@@ -310,3 +310,16 @@ class AuthToken(Base):
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, nullable=True)
     expires_at = Column(DateTime, nullable=True)
+
+
+class Log(Base):
+    __tablename__ = "logs"
+    id = Column(Integer, primary_key=True)
+    created_at = Column(DateTime, default=datetime.now)
+    operation_type = Column(
+        String, nullable=False
+    )  # CREATE, READ, UPDATE, DELETE, LOGIN, LOGOUT
+    description = Column(Text, nullable=True)
+    url = Column(String, nullable=True)
+    user_id = Column(Integer, nullable=True)
+    is_deleted = Column(Boolean, default=False)
