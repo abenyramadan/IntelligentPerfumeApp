@@ -1,17 +1,23 @@
-import { useState } from 'react';
-import { Button } from './src/components/ui/button';
-import { Input } from './src/components/ui/input';
-import { Label } from './src/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './src/components/ui/card';
-import { toast } from 'sonner';
+import { useState } from "react";
+import { Button } from "./src/components/ui/button";
+import { Input } from "./src/components/ui/input";
+import { Label } from "./src/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "./src/components/ui/card";
+import { toast } from "sonner";
 import ApiService from "./services/api.js";
 
 function RegisterPage({ onPageChange, onRegister }) {
   const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: '',
-    confirmPassword: ''
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
   });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -21,32 +27,45 @@ function RegisterPage({ onPageChange, onRegister }) {
 
     // Basic validation
     if (formData.password !== formData.confirmPassword) {
-      toast.error('Passwords do not match');
+      toast.error("Passwords do not match");
       setIsLoading(false);
       return;
     }
 
     if (formData.password.length < 6) {
-      toast.error('Password must be at least 6 characters long');
+      toast.error("Password must be at least 6 characters long");
       setIsLoading(false);
       return;
     }
 
     try {
       // Use ApiService
-      const user = await ApiService.createUser({
+      const response = await ApiService.createUser({
         username: formData.username,
         email: formData.email,
-        password: formData.password
+        password: formData.password,
       });
 
-      localStorage.setItem('user', JSON.stringify(user));
-      onRegister(user);
-      toast.success('Registration successful! Welcome to ScentAI!');
-      onPageChange('home');
+      if (response?.success) {
+        const userObj = {
+          user_id: response.data[0]?.user_id,
+          token: response.data[0]?.token,
+          token_type: response.data[0]?.type,
+          username: formData.username,
+        };
+
+        localStorage.setItem("user", JSON.stringify(userObj));
+        onLogin(userObj);
+        toast.success("Login successful!");
+        onPageChange("home");
+      } else {
+        toast.error(
+          response?.message || "Failed to create account. please try again"
+        );
+      }
     } catch (error) {
-      console.error('Registration error:', error);
-      toast.error(error.message || 'Registration failed. Please try again.');
+      console.error("Registration error:", error);
+      toast.error(error.message || "Registration failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -55,7 +74,7 @@ function RegisterPage({ onPageChange, onRegister }) {
   const handleInputChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
@@ -66,7 +85,9 @@ function RegisterPage({ onPageChange, onRegister }) {
           <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
             <span className="text-2xl text-white">✨</span>
           </div>
-          <CardTitle className="text-2xl font-bold text-gray-900">Create Account</CardTitle>
+          <CardTitle className="text-2xl font-bold text-gray-900">
+            Create Account
+          </CardTitle>
           <CardDescription className="text-gray-600">
             Join ScentAI and discover your perfect fragrance
           </CardDescription>
@@ -100,7 +121,7 @@ function RegisterPage({ onPageChange, onRegister }) {
                 className="border-gray-300 focus:border-purple-500 focus:ring-purple-500"
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <Input
@@ -134,13 +155,13 @@ function RegisterPage({ onPageChange, onRegister }) {
               className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-200 transform hover:scale-105"
               disabled={isLoading}
             >
-              {isLoading ? 'Creating Account...' : 'Create Account'}
+              {isLoading ? "Creating Account..." : "Create Account"}
             </Button>
 
             <div className="text-center">
               <button
                 type="button"
-                onClick={() => onPageChange('login')}
+                onClick={() => onPageChange("login")}
                 className="text-sm text-purple-600 hover:text-purple-800 transition-colors"
               >
                 Already have an account? Sign in

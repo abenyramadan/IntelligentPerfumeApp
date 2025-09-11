@@ -65,7 +65,9 @@ class AuthService:
             )  # type: ignore
 
             print("db token", db_token)
-            return db_token
+            return APIResponse(
+                success=True, message="Login successful", data=[db_token]
+            )
 
     @classmethod
     def logout(cls, token_id: int) -> APIResponse:

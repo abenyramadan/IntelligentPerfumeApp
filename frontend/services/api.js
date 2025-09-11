@@ -1,5 +1,5 @@
 // src/services/api.js
-const API_BASE_URL = "http://localhost:5000/api"; // must include /api
+const API_BASE_URL = "http://127.0.0.1:8000"; // must include /api
 
 const ApiService = {
   async createUser(userData) {
@@ -13,7 +13,7 @@ const ApiService = {
   },
 
   async login(userData) {
-    const res = await fetch(`${API_BASE_URL}/login`, {
+    const res = await fetch(`${API_BASE_URL}/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(userData),
