@@ -6,7 +6,7 @@ from schema.response_schema import APIResponse
 
 class PerfumeService:
     @classmethod
-    def create_perfume(cls, perfume: PerfumeSchema) -> Perfume:
+    def create_perfume(cls, perfume: PerfumeSchema) -> APIResponse:
         with get_session() as session:
             perfume_item = Perfume(**perfume.dict())
             session.add(perfume_item)
@@ -15,7 +15,7 @@ class PerfumeService:
             return APIResponse(success=True, message=f"Created perfume successfully")
 
     @classmethod
-    def update_perfume(cls, perfume_id: int, perfume: PerfumeSchema) -> dict:
+    def update_perfume(cls, perfume_id: int, perfume: PerfumeSchema) -> APIResponse:
 
         with get_session() as session:
             perfume_to_update = session.query(Perfume).filter_by(id=perfume_id).first()
@@ -54,7 +54,7 @@ class PerfumeService:
                 )
 
     @classmethod
-    def delete_perfume(cls, perfume_id: int) -> dict:
+    def delete_perfume(cls, perfume_id: int) -> APIResponse:
 
         with get_session() as session:
             perfume_to_delete = session.query(Perfume).filter_by(id=perfume_id).first()
@@ -83,7 +83,7 @@ class PerfumeService:
                     )
 
     @classmethod
-    def get_perfume_by_id(cls, perfume_id: int) -> Perfume | dict:
+    def get_perfume_by_id(cls, perfume_id: int) -> APIResponse:
 
         with get_session() as session:
             perfume = session.query(Perfume).filter_by(id=perfume_id).first()
@@ -97,7 +97,7 @@ class PerfumeService:
             return APIResponse(success=True, message="Found perfume", data=[perfume])
 
     @classmethod
-    def get_perfume_all(cls):
+    def get_perfume_all(cls) -> APIResponse:
         with get_session() as session:
 
             perfumes = session.query(Perfume).all()

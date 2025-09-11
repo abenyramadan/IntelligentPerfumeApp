@@ -6,9 +6,7 @@ from schema.response_schema import APIResponse
 
 class QuestionnaireService:
     @classmethod
-    def create_questionnaire(
-        cls, questionnaire: QuestionnaireSchema
-    ) -> Questionnaire | dict:
+    def create_questionnaire(cls, questionnaire: QuestionnaireSchema) -> APIResponse:
         with get_session() as session:
             db_qn = Questionnaire(**questionnaire.dict())
             session.add(db_qn)
@@ -19,7 +17,7 @@ class QuestionnaireService:
     @classmethod
     def update_questionnaire(
         cls, qn_id: int, questionnaire: QuestionnaireSchema
-    ) -> Questionnaire | dict:
+    ) -> APIResponse:
         with get_session() as session:
             db_qn = session.query(Questionnaire).filter_by(id=qn_id).first()
 
@@ -43,7 +41,7 @@ class QuestionnaireService:
                 )
 
     @classmethod
-    def delete_questionnaire(cls, q_id: int):
+    def delete_questionnaire(cls, q_id: int) -> APIResponse:
         with get_session() as session:
             db_qn = session.query(Questionnaire).filter_by(id=q_id).first()
 
@@ -71,7 +69,7 @@ class QuestionnaireService:
                     )
 
     @classmethod
-    def get_questionnaire_by_id(cls, q_id: int) -> Questionnaire | dict:
+    def get_questionnaire_by_id(cls, q_id: int) -> APIResponse:
         with get_session() as session:
             db_qn = session.query(Questionnaire).filter_by(id=q_id).first()
 
@@ -88,7 +86,7 @@ class QuestionnaireService:
                 )
 
     @classmethod
-    def get_questionnaires_all(cls) -> list[Questionnaire]:
+    def get_questionnaires_all(cls) -> APIResponse:
         with get_session() as session:
             db_qns = session.query(Questionnaire).all()
             if not db_qns:

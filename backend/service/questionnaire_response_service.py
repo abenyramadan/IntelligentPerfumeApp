@@ -9,7 +9,7 @@ class QuestionnaireResponseService:
     def create_questionnaire_response(
         cls,
         questionnaire_response: QuestionnaireResponseSchema,
-    ) -> QuestionnaireResponse:
+    ) -> APIResponse:
         with get_session() as session:
             questionnaire_item = QuestionnaireResponse(**questionnaire_response.dict())
             session.add(questionnaire_item)
@@ -23,7 +23,7 @@ class QuestionnaireResponseService:
     @classmethod
     def update_questionnaire_response(
         cls, qr_id, questionnaire_response: QuestionnaireResponseSchema
-    ) -> QuestionnaireResponse | dict:
+    ) -> APIResponse:
         with get_session() as session:
             db_qn_response = (
                 session.query(QuestionnaireResponse).filter_by(id=qr_id).first()
@@ -50,7 +50,7 @@ class QuestionnaireResponseService:
             )
 
     @classmethod
-    def delete_questionnaire_response(cls, qr_id) -> dict:
+    def delete_questionnaire_response(cls, qr_id) -> APIResponse:
 
         with get_session() as session:
             db_qn_response = (
@@ -73,9 +73,7 @@ class QuestionnaireResponseService:
                 )
 
     @classmethod
-    def get_questionnaire_response_by_id(
-        cls, qr_id: int
-    ) -> QuestionnaireResponse | dict:
+    def get_questionnaire_response_by_id(cls, qr_id: int) -> APIResponse:
 
         with get_session() as session:
             db_qn_response = (
@@ -95,7 +93,7 @@ class QuestionnaireResponseService:
                 )
 
     @classmethod
-    def get_questionnaire_respones_all(cls) -> list[QuestionnaireResponse]:
+    def get_questionnaire_respones_all(cls) -> APIResponse:
         with get_session() as session:
             db_qn_responses = session.query(QuestionnaireResponse).all()
 

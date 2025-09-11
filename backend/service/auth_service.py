@@ -32,7 +32,7 @@ class HashService:
 
 class AuthService:
     @classmethod
-    def login(cls, user: LoginSchema):
+    def login(cls, user: LoginSchema) -> APIResponse:
         with get_session() as db:
             db_user = db.query(User).filter(User.username == user.username).first()
             if db_user is None:
@@ -68,7 +68,7 @@ class AuthService:
             return db_token
 
     @classmethod
-    def logout(cls, token_id: int):
+    def logout(cls, token_id: int) -> APIResponse:
         try:
             TokenService.delete_token(token_id)
             return APIResponse(success=True, message="Logout succesful")

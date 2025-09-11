@@ -6,9 +6,7 @@ from schema.response_schema import APIResponse
 
 class RecommendationService:
     @classmethod
-    def create_recommendation(
-        cls, recommendation: RecommendationSchema
-    ) -> Recommendation | dict:
+    def create_recommendation(cls, recommendation: RecommendationSchema) -> APIResponse:
         with get_session() as session:
             db_rec = Recommendation(**recommendation.dict())
 
@@ -22,7 +20,7 @@ class RecommendationService:
     @classmethod
     def update_recommendation(
         cls, rec_id: int, recommendation: RecommendationSchema
-    ) -> Recommendation | dict:
+    ) -> APIResponse:
         with get_session() as session:
             db_rec = session.query(Recommendation).filter_by(id=rec_id).first()
 
@@ -62,7 +60,7 @@ class RecommendationService:
                 )
 
     @classmethod
-    def delete_recommendation(cls, rec_id: int) -> dict:
+    def delete_recommendation(cls, rec_id: int) -> APIResponse:
         with get_session() as session:
             db_rec = session.query(Recommendation).filter_by(id=rec_id).first()
 
@@ -89,7 +87,7 @@ class RecommendationService:
                     )
 
     @classmethod
-    def get_recommendation_by_id(cls, rec_id: int) -> Recommendation | dict:
+    def get_recommendation_by_id(cls, rec_id: int) -> APIResponse:
         with get_session() as session:
             db_rec = session.query(Recommendation).filter_by(id=rec_id).first()
             if not db_rec:
@@ -104,7 +102,7 @@ class RecommendationService:
                 )
 
     @classmethod
-    def get_recommendation_all(cls) -> list[Recommendation]:
+    def get_recommendation_all(cls) -> APIResponse:
         with get_session() as session:
             db_recs = session.query(Recommendation).all()
             if not db_recs:

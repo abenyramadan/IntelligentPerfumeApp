@@ -6,7 +6,7 @@ from schema.response_schema import APIResponse
 
 class UserProfileService:
     @classmethod
-    def create_user_profile(cls, profile: UserProfileSchema) -> UserProfile | dict:
+    def create_user_profile(cls, profile: UserProfileSchema) -> APIResponse:
         with get_session() as session:
 
             # one user cannot have more than one profile
@@ -35,7 +35,7 @@ class UserProfileService:
     @classmethod
     def update_user_profile(
         cls, profile_id: int, profile: UserProfileSchema
-    ) -> UserProfile | dict:
+    ) -> APIResponse:
         with get_session() as session:
             db_profile = session.query(UserProfile).filter_by(id=profile_id).first()
 
@@ -87,7 +87,7 @@ class UserProfileService:
                 )
 
     @classmethod
-    def delete_user_profile(cls, profile_id) -> dict:
+    def delete_user_profile(cls, profile_id) -> APIResponse:
         with get_session() as session:
             db_profile = session.query(UserProfile).filter_by(id=profile_id).first()
 
@@ -107,7 +107,7 @@ class UserProfileService:
                 )
 
     @classmethod
-    def get_user_profile_by_id(cls, profile_id) -> UserProfile | dict:
+    def get_user_profile_by_id(cls, profile_id) -> APIResponse:
         with get_session() as session:
             db_profile = session.query(UserProfile).filter_by(id=profile_id).first()
             if not db_profile:
@@ -122,7 +122,7 @@ class UserProfileService:
                 )
 
     @classmethod
-    def get_user_profile_all(cls) -> list[UserProfile]:
+    def get_user_profile_all(cls) -> APIResponse:
         with get_session() as session:
 
             db_profiles = session.query(UserProfile).all()

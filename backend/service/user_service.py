@@ -9,7 +9,7 @@ from service.auth_service import HashService
 
 class UserService:
     @classmethod
-    def create_user(cls, user: UserSchema) -> User | dict:
+    def create_user(cls, user: UserSchema) -> APIResponse:
         with get_session() as session:
 
             # check if user with same email or username already exists
@@ -36,7 +36,7 @@ class UserService:
                 )
 
     @classmethod
-    def update_user(cls, user_id: int, user: UserSchema) -> User | dict:
+    def update_user(cls, user_id: int, user: UserSchema) -> APIResponse:
 
         with get_session() as session:
             db_user = session.query(User).filter_by(id=user_id).first()
@@ -60,7 +60,7 @@ class UserService:
                 )
 
     @classmethod
-    def delete_user(cls, user_id: int) -> dict:
+    def delete_user(cls, user_id: int) -> APIResponse:
         with get_session() as session:
 
             db_user = session.query(User).filter_by(id=user_id).first()
@@ -91,7 +91,7 @@ class UserService:
                     )
 
     @classmethod
-    def get_user_by_id(cls, user_id: int) -> User | dict:
+    def get_user_by_id(cls, user_id: int) -> APIResponse:
 
         with get_session() as session:
             db_user = session.query(User).filter(User.id == user_id).first()
@@ -106,7 +106,7 @@ class UserService:
                 return APIResponse(success=True, message="Found user", data=[db_user])
 
     @classmethod
-    def get_users_all(cls) -> list[User]:
+    def get_users_all(cls) -> APIResponse:
         with get_session() as session:
             db_users = session.query(User).all()
 
