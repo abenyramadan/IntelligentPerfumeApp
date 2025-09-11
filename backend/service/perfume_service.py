@@ -126,3 +126,18 @@ class PerfumeService:
 
             perfumes = session.query(Perfume).all()
             return APIResponse(success=True, message="All good", data=perfumes)
+
+    # DANGEROUS OPERATION::::: DON'T TRY!!!!!!!
+    @classmethod
+    def delete_perfumes_all(cls) -> APIResponse:
+        with get_session() as session:
+            try:
+                session.query(Perfume).delete()
+                session.commit()
+                return APIResponse(success=True, message="Deleted all perfumes <:")
+            except:
+                return APIResponse(
+                    status_code=500,
+                    success=False,
+                    message="Failed to wipe out all perfumes. Thank God!",
+                )

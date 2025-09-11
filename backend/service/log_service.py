@@ -8,7 +8,6 @@ class LogService:
     @classmethod
     def create_log(cls, _log: LogSchema) -> APIResponse:
         with get_session() as session:
-
             try:
                 log_item = Log(**_log.dict())
                 session.add(log_item)
@@ -87,3 +86,16 @@ class LogService:
                 db_logs = []
 
             return APIResponse(success=True, message="All good", data=db_logs)
+
+    # THIS IS A DANGEROUS OPERATION: DON'T TRY!!!!!!!!!!!
+    @classmethod
+    def delete_logs_all(cls) -> APIResponse:
+        with get_session() as session:
+            try:
+                session.query(Log).delete()
+                session.commit()
+                return APIResponse(success=True, message="Deleted all logs!")
+            except:
+                return APIResponse(
+                    success=False, message="Failed to clear all logs. Thank God!"
+                )

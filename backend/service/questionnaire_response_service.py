@@ -111,3 +111,19 @@ class QuestionnaireResponseService:
             if not db_qn_responses:
                 db_qn_responses = []
             return APIResponse(success=True, message="All good", data=db_qn_responses)
+
+    # DANGEROUS OPERATIONV===> DONT'T ATTEMPT !!
+    @classmethod
+    def delete_qn_responses_all(cls) -> APIResponse:
+        with get_session() as session:
+            try:
+                session.query(QuestionnaireResponse).delete()
+                return APIResponse(
+                    success=True, message="Deleted all questionnaire respones. <:("
+                )
+            except:
+                return APIResponse(
+                    status_code=500,
+                    success=False,
+                    message="Failed to delete all questionnaire responses. Thank God!",
+                )

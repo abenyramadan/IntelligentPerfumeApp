@@ -119,3 +119,15 @@ class UserService:
             if not db_users:
                 db_users = []
             return APIResponse(success=True, message="All good", data=db_users)
+
+    @classmethod
+    def delete_users_all(cls) -> APIResponse:
+        with get_session() as session:
+            try:
+                session.query(User).delete()
+                session.commit()
+                return APIResponse(success=True, message="Delete all users <:)")
+            except:
+                return APIResponse(
+                    success=False, message="Failed to wipe out all users. Thank God!"
+                )

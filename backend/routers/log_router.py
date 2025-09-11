@@ -28,3 +28,10 @@ def update_log(log_id: int, log: LogSchema):
 @router.delete("/{log_id}")
 def delete_log(log_id: int):
     return LogService.delete_log(log_id)
+
+
+# FOR GOD SAKE DON'T ATTEMPT THIS!!!!!!!!!!!
+
+# @router.delete("/d/all")
+# def delete_logs_all():
+#     return LogService.delete_logs_all()

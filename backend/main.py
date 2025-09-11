@@ -1,6 +1,10 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from contextlib import asynccontextmanager
 from db.core import Base, db_engine
+from starlette.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from fastapi.encoders import jsonable_encoder
+from typing import Union
 
 # routers
 from routers.perfume_router import router as perfume_router
@@ -15,6 +19,13 @@ from routers.auth_router import router as auth_router
 from routers.log_router import router as log_router
 
 from db.populate_db import insert_perfumes
+
+
+class EntityException(Exception):
+    def __init__(self, code: int, message: str, exception: str):
+        self.code = code
+        self.message = message
+        self.exception = exception
 
 
 # create lifespan to init db
@@ -39,6 +50,55 @@ app = FastAPI(
         "url": "htttps://x.com/awetthon",
     },
     lifespan=lifespan,
+)
+
+
+allowed_origins = ["*"]
+
+
+@app.exception_handler(Exception)
+async def exception_handler(
+    request: Request, exception: Union[Exception, RuntimeError]
+):
+    headers = {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Credentials": "true",
+        "Access-Control-Allow-Methods": "*",
+        "Access-Control-Allow-Headers": "*",
+    }
+    if isinstance(exception, EntityException):
+        response = JSONResponse(
+            jsonable_encoder(
+                {
+                    "code": exception.code,
+                    "message": exception.message,
+                    "exception": exception.exception,
+                }
+            ),
+            headers=headers,
+        )
+    else:
+        response = JSONResponse(
+            jsonable_encoder(
+                {
+                    "exception": str(exception),
+                    "code": 500,
+                }
+            ),
+            headers=headers,
+        )
+    return response
+
+
+# CORS middleware
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allowed_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
