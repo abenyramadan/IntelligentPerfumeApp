@@ -10,6 +10,6 @@ def login(user: LoginSchema):
     return AuthService.login(user)
 
 
-@router.get("/logout")
-def logout():
-    pass
+@router.get("/logout/{token_id}")
+def logout(token_id: int):
+    return AuthService.logout(token_id)

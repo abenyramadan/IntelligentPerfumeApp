@@ -20,6 +20,7 @@ class User(Base):
     username = Column(String(50), index=True)
     email = Column(String(60), nullable=False)
     password = Column(String)
+    role = Column(String, default="USER")
     created_at = Column(DateTime, default=datetime.now)
 
 
@@ -302,7 +303,7 @@ class Recommendation(Base):
 class AuthToken(Base):
     __tablename__ = "auth_tokens"
     id = Column(Integer, primary_key=True, autoincrement=True)
-    token = Column(String(150), unique=True, nullable=False)
+    token = Column(String(250), unique=True, nullable=False)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     type = Column(String(50), default="access_token")
     is_deleted = Column(Boolean, default=False)

@@ -1,7 +1,7 @@
 from db.core import get_session
 from db.models import Recommendation
 from schema.recommendation_schema import RecommendationSchema
-from schema.response_schema import ResponseSchema
+from schema.response_schema import APIResponse
 
 
 class RecommendationService:
@@ -25,7 +25,7 @@ class RecommendationService:
             db_rec = session.query(Recommendation).filter_by(id=rec_id).first()
 
             if not db_rec:
-                return ResponseSchema(
+                return APIResponse(
                     success=False,
                     message=f"Cannot find recommendation with id: {rec_id}",
                 )
@@ -62,14 +62,14 @@ class RecommendationService:
             db_rec = session.query(Recommendation).filter_by(id=rec_id).first()
 
             if not db_rec:
-                return ResponseSchema(
+                return APIResponse(
                     success=False,
                     message=f"Cannot find recommendaiton with id: {rec_id}",
                 )
             else:
                 session.delete(db_rec)
                 session.commit()
-                return ResponseSchema(
+                return APIResponse(
                     success=True,
                     message=f"Recommendation with id: {rec_id} deleted successfully",
                 )
@@ -79,7 +79,7 @@ class RecommendationService:
         with get_session() as session:
             db_rec = session.query(Recommendation).filter_by(id=rec_id).first()
             if not db_rec:
-                return ResponseSchema(
+                return APIResponse(
                     success=False,
                     message=f"Cannot find recommendation with id: {rec_id}",
                 )

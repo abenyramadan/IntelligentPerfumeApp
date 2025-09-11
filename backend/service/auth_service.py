@@ -2,6 +2,7 @@ from passlib.context import CryptContext
 from schema.login_schema import LoginSchema
 from db.core import get_session
 from db.models import User, AuthToken
+from schema.response_schema import APIResponse
 
 
 from db.core import get_session
@@ -30,15 +31,20 @@ class HashService:
 
 
 class AuthService:
-
+    @classmethod
     def login(cls, user: LoginSchema):
         with get_session() as db:
             db_user = db.query(User).filter(User.username == user.username).first()
             if db_user is None:
-                return {"success": False, "message": "username not found"}
+                return APIResponse(
+                    success=False,
+                    message=f"Cannot find user with username : {user.username}",
+                )
 
             if not HashService.verify_password(user.password, db_user.password):  # type: ignore
-                return {"success": False, "message": "Incorrect username or password"}
+                return APIResponse(
+                    success=False, message=f"Incorrect username or password"
+                )
 
             user_token = TokenService.generate_token(
                 {
@@ -62,8 +68,12 @@ class AuthService:
             return db_token
 
     @classmethod
-    def logout(cls):
-        pass
+    def logout(cls, token_id: int):
+        try:
+            TokenService.delete_token(token_id)
+            return APIResponse(success=True, message="Logout succesful")
+        except:
+            return APIResponse(success=False, message="Failed to logout")
 
     @classmethod
     def reset_password(cls):
@@ -103,23 +113,30 @@ class TokenService:
         with get_session() as db:
             db_token = db.query(AuthToken).filter(AuthToken.id == token_id).first()
             if not db_token:
-                return {"success": False, "message": "Token not found"}
+                return APIResponse(
+                    success=False, message=f"Cannot find token with id: {token_id}"
+                )
 
-            db.delete(db_token)
-            db.commit()
-            return {"success": True, "message": "Token deleted"}
+            try:
+
+                db.delete(db_token)
+                db.commit()
+                return APIResponse(success=True, message="Token deleted successfully")
+            except:
+                return APIResponse(success=False, message=f"Failed to delete token")
 
     @classmethod
-    def get_token(cls, token_id: int) -> AuthToken:
+    def get_token_by_id(cls, token_id: int) -> AuthToken:
         with get_session() as db:
             db_token = db.query(AuthToken).filter(AuthToken.id == token_id).first()
             if not db_token:
-                return {"success": False, "message": "Token not found"}
-
+                return APIResponse(
+                    success=False, message=f"Cannot find token with id: {token_id}"
+                )
             return db_token
 
     @classmethod
-    def get_tokens(cls) -> list[AuthToken]:
+    def get_tokens_all(cls) -> list[AuthToken]:
         with get_session() as db:
             db_tokens = db.query(AuthToken).order_by(AuthToken.created_at.desc()).all()
-            return db_tokens
+            return db_tokens or []

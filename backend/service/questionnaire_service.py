@@ -1,7 +1,7 @@
 from db.core import get_session
 from db.models import Questionnaire
 from schema.questionnaire_schema import QuestionnaireSchema
-from schema.response_schema import ResponseSchema
+from schema.response_schema import APIResponse
 
 
 class QuestionnaireService:
@@ -24,7 +24,7 @@ class QuestionnaireService:
             db_qn = session.query(Questionnaire).filter_by(id=qn_id).first()
 
             if not db_qn:
-                return ResponseSchema(
+                return APIResponse(
                     success=False, message=f"Cannot find questionnaire with id: {qn_id}"
                 )
 
@@ -44,7 +44,7 @@ class QuestionnaireService:
             db_qn = session.query(Questionnaire).filter_by(id=q_id).first()
 
             if not db_qn:
-                return ResponseSchema(
+                return APIResponse(
                     success=False, message=f"Cannot find questionnaire with id: {q_id}"
                 )
 
@@ -54,12 +54,12 @@ class QuestionnaireService:
 
                     session.delete(db_qn)
                     session.commit()
-                    return ResponseSchema(
+                    return APIResponse(
                         success=True,
                         message=f"Questionnaire with id: {q_id} deleted succesfully",
                     )
                 except:
-                    return ResponseSchema(
+                    return APIResponse(
                         success=False,
                         message=f"Failed to delete questionnaire with id: {q_id}",
                     )
@@ -70,7 +70,7 @@ class QuestionnaireService:
             db_qn = session.query(Questionnaire).filter_by(id=q_id).first()
 
             if not db_qn:
-                return ResponseSchema(
+                return APIResponse(
                     success=False, message=f"Cannot find quesitonnaire with id: {q_id}"
                 )
 

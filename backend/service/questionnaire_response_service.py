@@ -1,7 +1,7 @@
 from db.core import get_session
 from db.models import QuestionnaireResponse
 from schema.questionnaire_response_schema import QuestionnaireResponseSchema
-from schema.response_schema import ResponseSchema
+from schema.response_schema import APIResponse
 
 
 class QuestionnaireResponseService:
@@ -28,7 +28,7 @@ class QuestionnaireResponseService:
             )
 
             if not db_qn_response:
-                return ResponseSchema(
+                return APIResponse(
                     success=False,
                     message=f"Cannot find questionnaire response with id {qr_id}",
                 )
@@ -53,7 +53,7 @@ class QuestionnaireResponseService:
             )
 
             if not db_qn_response:
-                return ResponseSchema(
+                return APIResponse(
                     success=False,
                     message=f"Cannot find quesitonnaire response with id: {qr_id}",
                 )
@@ -61,7 +61,7 @@ class QuestionnaireResponseService:
             else:
                 session.delete(db_qn_response)
                 session.commit()
-                return ResponseSchema(
+                return APIResponse(
                     success=True,
                     message=f"Questionnaire response with id: {qr_id} deleted successfully",
                 )
@@ -77,7 +77,7 @@ class QuestionnaireResponseService:
             )
 
             if not db_qn_response:
-                return ResponseSchema(
+                return APIResponse(
                     success=False, message=f"Cannot find question with id: {qr_id}"
                 )
 

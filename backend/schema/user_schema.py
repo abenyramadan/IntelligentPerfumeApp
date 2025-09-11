@@ -5,3 +5,4 @@ class UserSchema(BaseModel):
     username: str
     email: str
     password: str
+    role: str | None = "USER"

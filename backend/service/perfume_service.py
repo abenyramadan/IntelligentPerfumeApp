@@ -1,7 +1,7 @@
 from db.core import get_session
 from db.models import Perfume
 from schema.perfume_schema import PerfumeSchema
-from schema.response_schema import ResponseSchema
+from schema.response_schema import APIResponse
 
 
 class PerfumeService:
@@ -21,9 +21,7 @@ class PerfumeService:
             perfume_to_update = session.query(Perfume).filter_by(id=perfume_id).first()
 
             if not perfume_to_update:
-                return ResponseSchema(
-                    False, f"Cannot find perfume with id: {perfume_id}"
-                )
+                return APIResponse(False, f"Cannot find perfume with id: {perfume_id}")
 
             else:
                 perfume_to_update.name = perfume.name
@@ -46,7 +44,7 @@ class PerfumeService:
                 session.add(perfume_to_update)
                 session.commit()
 
-                return ResponseSchema(
+                return APIResponse(
                     success=True,
                     message=f"Perfume with id {perfume_id} updated successfully",
                 )
@@ -58,7 +56,7 @@ class PerfumeService:
             perfume_to_delete = session.query(Perfume).filter_by(id=perfume_id).first()
 
             if not perfume_to_delete:
-                return ResponseSchema(
+                return APIResponse(
                     success=False, message=f"Cannot find perfume with id: {perfume_id}"
                 )
             else:
@@ -67,12 +65,12 @@ class PerfumeService:
 
                     session.delete(perfume_to_delete)
                     session.commit()
-                    return ResponseSchema(
+                    return APIResponse(
                         success=True,
                         message=f"Perfume with id: {perfume_id} deleted successfully",
                     )
                 except:
-                    return ResponseSchema(
+                    return APIResponse(
                         success=False,
                         message=f"Failed to delete perfume with id: {perfume_id}",
                     )
@@ -84,7 +82,7 @@ class PerfumeService:
             perfume = session.query(Perfume).filter_by(id=perfume_id).first()
 
             if not perfume:
-                return ResponseSchema(
+                return APIResponse(
                     success=False, message=f"Cannot find perfume with id: {perfume_id}"
                 )
             return perfume

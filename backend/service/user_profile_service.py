@@ -1,7 +1,7 @@
 from db.core import get_session
 from db.models import UserProfile
 from schema.user_profile_schema import UserProfileSchema
-from schema.response_schema import ResponseSchema
+from schema.response_schema import APIResponse
 
 
 class UserProfileService:
@@ -15,7 +15,7 @@ class UserProfileService:
             )
 
             if db_user_profile:
-                return ResponseSchema(
+                return APIResponse(
                     success=False,
                     message=f"User with id: {profile.user_id} already has a profile",
                 )
@@ -28,7 +28,7 @@ class UserProfileService:
                     session.commit()
                     return new_profile
                 except:
-                    return ResponseSchema(
+                    return APIResponse(
                         success=False, message="Failed to create profile"
                     )
 
@@ -40,7 +40,7 @@ class UserProfileService:
             db_profile = session.query(UserProfile).filter_by(id=profile_id).first()
 
             if not db_profile:
-                return ResponseSchema(
+                return APIResponse(
                     success=False, message=f"Cannot find profile with id: {profile_id}"
                 )
             else:
@@ -88,14 +88,14 @@ class UserProfileService:
             db_profile = session.query(UserProfile).filter_by(id=profile_id).first()
 
             if not db_profile:
-                return ResponseSchema(
+                return APIResponse(
                     success=False, message=f"Cannot find profile with id: {profile_id}"
                 )
 
             else:
                 session.delete(db_profile)
                 session.commit()
-                return ResponseSchema(
+                return APIResponse(
                     success=True,
                     message=f"User profile with id: {profile_id} deleted successfully",
                 )
@@ -105,7 +105,7 @@ class UserProfileService:
         with get_session() as session:
             db_profile = session.query(UserProfile).filter_by(id=profile_id).first()
             if not db_profile:
-                return ResponseSchema(
+                return APIResponse(
                     success=False,
                     message=f"Cannot find user profile with id: {profile_id}",
                 )

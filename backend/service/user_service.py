@@ -1,7 +1,7 @@
 from db.core import get_session
 from db.models import User
 from sqlalchemy import or_
-from schema.response_schema import ResponseSchema
+from schema.response_schema import APIResponse
 from schema.user_schema import UserSchema
 
 from service.auth_service import HashService
@@ -20,7 +20,7 @@ class UserService:
             )
 
             if db_user:
-                return ResponseSchema(
+                return APIResponse(
                     success=False,
                     message="User with same email or username already exists",
                 )
@@ -30,7 +30,7 @@ class UserService:
                 new_user.password = HashService.hash_password(new_user.password)
                 session.add(new_user)
                 session.commit()
-                return ResponseSchema(
+                return APIResponse(
                     success=True,
                     message=f"User with username: {user.username} created successfully",
                 )
@@ -43,7 +43,7 @@ class UserService:
 
             # check if user with given id exists
             if not db_user:
-                return ResponseSchema(
+                return APIResponse(
                     success=False, message=f"Cannot find user with id: {user_id}"
                 )
             else:
@@ -53,7 +53,7 @@ class UserService:
 
                 session.add(db_user)
                 session.commit()
-                return ResponseSchema(
+                return APIResponse(
                     success=True, message=f"User detail updated successfully"
                 )
 
@@ -64,7 +64,7 @@ class UserService:
             db_user = session.query(User).filter_by(id=user_id).first()
 
             if not db_user:
-                return ResponseSchema(
+                return APIResponse(
                     success=False, message=f"Cannot find user with id: {user_id}"
                 )
 
@@ -73,13 +73,13 @@ class UserService:
 
                     session.delete(db_user)
                     session.commit()
-                    return ResponseSchema(
+                    return APIResponse(
                         success=True,
                         message=f"User with id: {user_id} deleted successfully",
                     )
 
                 except:
-                    return ResponseSchema(
+                    return APIResponse(
                         success=False,
                         message=f"Failed to delete user with id: {user_id}",
                     )
@@ -91,7 +91,7 @@ class UserService:
             db_user = session.query(User).filter(User.id == user_id).first()
 
             if not db_user:
-                return ResponseSchema(
+                return APIResponse(
                     success=False, message=f"Cannot find user with id: {user_id}"
                 )
             else:
