@@ -8,11 +8,17 @@ class LogService:
     @classmethod
     def create_log(cls, _log: LogSchema) -> APIResponse:
         with get_session() as session:
-            log_item = Log(**_log.dict())
-            session.add(log_item)
-            session.commit()
 
-            return APIResponse(success=True, message="created log successfully")
+            try:
+
+                log_item = Log(**_log.dict())
+                session.add(log_item)
+                session.commit()
+                return APIResponse(success=True, message="created log successfully")
+            except:
+                return APIResponse(
+                    success=False, status_code=500, message="Failed to create log"
+                )
 
     @classmethod
     def update_log(cls, log_id: int, log: LogSchema) -> APIResponse:

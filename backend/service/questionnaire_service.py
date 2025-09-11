@@ -8,11 +8,22 @@ class QuestionnaireService:
     @classmethod
     def create_questionnaire(cls, questionnaire: QuestionnaireSchema) -> APIResponse:
         with get_session() as session:
-            db_qn = Questionnaire(**questionnaire.dict())
-            session.add(db_qn)
-            session.commit()
-            session.refresh(db_qn)
-            return APIResponse(success=True, message="Questionnaire saved successfully")
+
+            try:
+
+                db_qn = Questionnaire(**questionnaire.dict())
+                session.add(db_qn)
+                session.commit()
+                session.refresh(db_qn)
+                return APIResponse(
+                    success=True, message="Questionnaire saved successfully"
+                )
+            except:
+                return APIResponse(
+                    status_code=500,
+                    success=False,
+                    message="Failed to create questionnaire",
+                )
 
     @classmethod
     def update_questionnaire(

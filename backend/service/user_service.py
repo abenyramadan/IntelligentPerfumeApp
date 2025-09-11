@@ -26,14 +26,21 @@ class UserService:
                 )
 
             else:
-                new_user = User(**user.dict())
-                new_user.password = HashService.hash_password(new_user.password)
-                session.add(new_user)
-                session.commit()
-                return APIResponse(
-                    success=True,
-                    message=f"User with username: {user.username} created successfully",
-                )
+
+                try:
+
+                    new_user = User(**user.dict())
+                    new_user.password = HashService.hash_password(new_user.password)
+                    session.add(new_user)
+                    session.commit()
+                    return APIResponse(
+                        success=True,
+                        message=f"User with username: {user.username} created successfully",
+                    )
+                except:
+                    return APIResponse(
+                        status_code=500, success=False, message="Failed to create user"
+                    )
 
     @classmethod
     def update_user(cls, user_id: int, user: UserSchema) -> APIResponse:

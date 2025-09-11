@@ -11,14 +11,25 @@ class QuestionnaireResponseService:
         questionnaire_response: QuestionnaireResponseSchema,
     ) -> APIResponse:
         with get_session() as session:
-            questionnaire_item = QuestionnaireResponse(**questionnaire_response.dict())
-            session.add(questionnaire_item)
-            session.commit()
-            session.refresh(questionnaire_item)
 
-            return APIResponse(
-                success=True, message="Questionnaire response saved successfully"
-            )
+            try:
+
+                questionnaire_item = QuestionnaireResponse(
+                    **questionnaire_response.dict()
+                )
+                session.add(questionnaire_item)
+                session.commit()
+                session.refresh(questionnaire_item)
+
+                return APIResponse(
+                    success=True, message="Questionnaire response saved successfully"
+                )
+            except:
+                return APIResponse(
+                    status_code=500,
+                    success=False,
+                    message="Failed to create questionnaire response",
+                )
 
     @classmethod
     def update_questionnaire_response(

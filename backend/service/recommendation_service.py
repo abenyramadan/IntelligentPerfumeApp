@@ -8,14 +8,23 @@ class RecommendationService:
     @classmethod
     def create_recommendation(cls, recommendation: RecommendationSchema) -> APIResponse:
         with get_session() as session:
-            db_rec = Recommendation(**recommendation.dict())
 
-            session.add(db_rec)
-            session.commit()
-            session.refresh(db_rec)
-            return APIResponse(
-                success=True, message="Recommendation created successfully"
-            )
+            try:
+
+                db_rec = Recommendation(**recommendation.dict())
+
+                session.add(db_rec)
+                session.commit()
+                session.refresh(db_rec)
+                return APIResponse(
+                    success=True, message="Recommendation created successfully"
+                )
+            except:
+                return APIResponse(
+                    status_code=500,
+                    success=False,
+                    message="Failed to create recommendation",
+                )
 
     @classmethod
     def update_recommendation(

@@ -7,15 +7,30 @@ from schema.response_schema import APIResponse
 class PerfumeService:
     @classmethod
     def create_perfume(cls, perfume: PerfumeSchema) -> APIResponse:
+        """
+        Takes perfume of type PerfumeSchema and save it to db
+        """
+
         with get_session() as session:
-            perfume_item = Perfume(**perfume.dict())
-            session.add(perfume_item)
-            session.commit()
-            session.refresh(perfume_item)
-            return APIResponse(success=True, message=f"Created perfume successfully")
+            try:
+
+                perfume_item = Perfume(**perfume.dict())
+                session.add(perfume_item)
+                session.commit()
+                session.refresh(perfume_item)
+                return APIResponse(
+                    success=True, message=f"Created perfume successfully"
+                )
+            except:
+                return APIResponse(
+                    status_code=500, success=False, message="Failed to create perfume"
+                )
 
     @classmethod
     def update_perfume(cls, perfume_id: int, perfume: PerfumeSchema) -> APIResponse:
+        """
+        Updates perfume with given id
+        """
 
         with get_session() as session:
             perfume_to_update = session.query(Perfume).filter_by(id=perfume_id).first()
@@ -55,6 +70,9 @@ class PerfumeService:
 
     @classmethod
     def delete_perfume(cls, perfume_id: int) -> APIResponse:
+        """
+        Delete perfume with given id
+        """
 
         with get_session() as session:
             perfume_to_delete = session.query(Perfume).filter_by(id=perfume_id).first()
@@ -84,6 +102,9 @@ class PerfumeService:
 
     @classmethod
     def get_perfume_by_id(cls, perfume_id: int) -> APIResponse:
+        """
+        Fetch perfume with given id
+        """
 
         with get_session() as session:
             perfume = session.query(Perfume).filter_by(id=perfume_id).first()
@@ -98,6 +119,9 @@ class PerfumeService:
 
     @classmethod
     def get_perfume_all(cls) -> APIResponse:
+        """
+        Read all perfumes
+        """
         with get_session() as session:
 
             perfumes = session.query(Perfume).all()
