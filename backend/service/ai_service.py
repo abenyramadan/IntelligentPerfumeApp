@@ -1,8 +1,14 @@
 from schema.user_profile_schema import UserProfileSchema
+from schema.ai_response_schema import AIResponseSchema
 from google import genai
 from google.genai import types
 
 client = genai.Client()
+
+
+prompt = """
+You are an LLM model trained on 
+"""
 
 
 class AIService:
@@ -11,13 +17,14 @@ class AIService:
         try:
             response = client.models.generate_content(
                 model="gemini-2.5-flash",
-                contents="Explain how AI works in a few words",
-                config=types.GenerateContentConfig(
-                    thinking_config=types.ThinkingConfig(
-                        thinking_budget=0
-                    )  # Disables thinking
-                ),
+                contents=prompt,
+                config={
+                    "response_mime_type": "application/json",
+                    "response_schema": AIResponseSchema,
+                },
             )
+
+            print(response.text)
         except:
             print("something went wrong")
 
