@@ -8,17 +8,17 @@ const ProfilePage = ({ userId }) => {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
 
+  const BASE_API_URL = "http://localhost:8000";
+
   // Fetch user profile and recommendation
   useEffect(() => {
-    fetch(`http://localhost:8000/api/user-profiles/${userId}`)
+    fetch(`${BASE_API_URL}/user-profiles/${userId}`)
       .then((res) => (res.status === 404 ? null : res.json()))
       .then((data) => {
         setProfile(data);
         setLoading(false);
         if (data && data.recommendation_id) {
-          fetch(
-            `http://localhost:8000/api/recommendations/${data.recommendation_id}`
-          )
+          fetch(`${BASE_API_URL}/recommendations/${data.recommendation_id}`)
             .then((res) => res.json())
             .then((rec) => setRecommendation(rec));
         }
@@ -70,10 +70,7 @@ const ProfilePage = ({ userId }) => {
           ) : null
         )}
       </ul>
-      <button
-        onClick={() => setEditing(true)}
-        style={{ margin: "1em 0" }}
-      >
+      <button onClick={() => setEditing(true)} style={{ margin: "1em 0" }}>
         Update Profile
       </button>
       <h3>Your Recommendation</h3>
@@ -99,4 +96,3 @@ const ProfilePage = ({ userId }) => {
 };
 
 export default ProfilePage;
-

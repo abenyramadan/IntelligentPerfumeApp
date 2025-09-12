@@ -17,7 +17,8 @@ import ApiService from "./services/api.js";
 import { toast } from "sonner";
 
 import { convertToArray, groupDataByKey } from "./utils/utils.js";
-import { Car } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
+
 const getCurrentUserId = () => {
   try {
     const u = JSON.parse(localStorage.getItem("user"));
@@ -198,13 +199,19 @@ const QuestionnairePage = ({ userId: propUserId }) => {
 
                 <div className="flex justify-end gap-3">
                   {topicId > 0 && (
-                    <Button onClick={handlePrevious}>Previous</Button>
+                    <Button onClick={handlePrevious}>
+                      <ArrowLeft />
+                      Previous
+                    </Button>
                   )}
 
                   {topicId === questions.length - 1 ? (
                     <Button>Submit</Button>
                   ) : (
-                    <Button onClick={handleNext}>Next</Button>
+                    <Button onClick={handleNext}>
+                      Next
+                      <ArrowRight />
+                    </Button>
                   )}
                 </div>
               </CardContent>
