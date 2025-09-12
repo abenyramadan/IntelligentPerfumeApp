@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
@@ -17,11 +17,13 @@ const getCurrentUserId = () => {
   } catch { return 1 }
 }
 
-const QuestionnairePage = ({ userId: propUserId }) => {
+const QuestionnairePage = ({ userId: propUserId, onProfileCreated }) => {
   const resolvedUserId = propUserId || getCurrentUserId()
   const { responses, loading, submitResponse } = useQuestionnaire(resolvedUserId)
   const [answers, setAnswers] = useState({})
   const [questions, setQuestions] = useState([])
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState("")
 
   useEffect(() => {
     const load = async () => {
@@ -46,6 +48,8 @@ const QuestionnairePage = ({ userId: propUserId }) => {
   }
 
   const handleSubmit = async () => {
+    setSubmitting(true)
+    setError("")
     // Ensure user exists before submitting responses
     let userId = resolvedUserId;
     try {
@@ -71,30 +75,99 @@ const QuestionnairePage = ({ userId: propUserId }) => {
       return;
     }
     // Submit questionnaire responses using the correct userId
-    for (const q of questions) {
-      const value = answers[q.id];
-      if (value === undefined || value === '') continue;
-      const payload = q.type === 'number'
-        ? { question_id: q.id, answer_number: Number(value) }
-        : { question_id: q.id, answer_text: value };
-      await ApiService.submitQuestionnaireResponse(userId, payload);
-    }
-    // Fetch recommendation after submitting responses
     try {
-      const recRes = await fetch(`http://localhost:5000/api/users/${userId}/daily-recommendation`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-      });
-      if (recRes.ok) {
-        const rec = await recRes.json();
-        alert(`Recommended perfume: ${rec.perfume?.brand || ''} - ${rec.perfume?.name || ''}`);
-      } else {
-        alert('Failed to fetch recommendation.');
+      for (const q of questions) {
+        const value = answers[q.id];
+        if (value === undefined || value === '') continue;
+        const payload = q.type === 'number'
+          ? { question_id: q.id, answer_number: Number(value) }
+          : { question_id: q.id, answer_text: value };
+        await ApiService.submitQuestionnaireResponse(userId, payload);
+      }
+      // Fetch recommendation after submitting responses
+      try {
+        const recRes = await fetch(`http://localhost:5000/api/users/${userId}/daily-recommendation`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        if (recRes.ok) {
+          const rec = await recRes.json();
+          alert(`Recommended perfume: ${rec.perfume?.brand || ''} - ${rec.perfume?.name || ''}`);
+        } else {
+          alert('Failed to fetch recommendation.');
+        }
+      } catch (err) {
+        alert('Error fetching recommendation: ' + err);
       }
     } catch (err) {
-      alert('Error fetching recommendation: ' + err);
+      setError("Could not submit responses. Please try again.");
     }
+    setSubmitting(false)
   }
+
+  if (loading) return <div>Loading questions...</div>;
+
+  const renderInput = q => {
+    const name = q.key || q.name;
+    const value = answers[name] || "";
+
+    if (q.type === "select" && Array.isArray(q.options)) {
+      return (
+        <Select
+          value={value}
+          onValueChange={(v) => handleChange(name, v)}
+        >
+          <SelectContent>
+            {q.options.map(opt => (
+              <SelectItem key={opt.value || opt} value={opt.value || opt}>{opt.label || opt}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      );
+    }
+
+    if (q.type === "radio" && Array.isArray(q.options)) {
+      return (
+        <div>
+          {q.options.map(opt => (
+            <label key={opt.value || opt} style={{ marginRight: "1em" }}>
+              <input
+                type="radio"
+                name={name}
+                value={opt.value || opt}
+                checked={value === (opt.value || opt)}
+                onChange={() => handleChange(name, opt.value || opt)}
+                required={q.required !== false}
+              />
+              {opt.label || opt}
+            </label>
+          ))}
+        </div>
+      );
+    }
+
+    if (q.type === "textarea") {
+      return (
+        <textarea
+          name={name}
+          required={q.required !== false}
+          value={value}
+          onChange={e => handleChange(e, q)}
+        />
+      );
+    }
+
+    // Default to text/number/email/etc.
+    return (
+      <Input
+        name={name}
+        type={q.type || "text"}
+        required={q.required !== false}
+        value={value}
+        onChange={e => handleChange(e, q)}
+      />
+    );
+  };
 
   return (
     <div className="max-w-3xl mx-auto space-y-8">
@@ -106,38 +179,14 @@ const QuestionnairePage = ({ userId: propUserId }) => {
           {questions.map(q => (
             <div key={q.id}>
               <Label htmlFor={q.id}>{q.label}</Label>
-              {q.type === 'select' && !q.multiple && (
-                <Select
-                  value={answers[q.id] || ""}
-                  onValueChange={(v) => handleChange(q.id, v)}
-                >
-                  <SelectContent>
-                    {q.options?.map(opt => (
-                      <SelectItem key={opt} value={opt}>{opt}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-              {q.type === 'select' && q.multiple && (
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
-                  {q.options?.map(opt => (
-                    <div key={opt} className="flex items-center space-x-2">
-                      <Checkbox id={`${q.id}-${opt}`} checked={(answers[q.id]||[]).includes(opt)} onCheckedChange={() => toggleMultiSelect(q.id, opt, q.max)} />
-                      <Label htmlFor={`${q.id}-${opt}`} className="text-sm">{opt}</Label>
-                    </div>
-                  ))}
-                </div>
-              )}
-              {q.type === 'number' && (
-                <Input type="number" min={q.min} max={q.max} step={q.step||1} onChange={(e)=>handleChange(q.id, e.target.value)} />
-              )}
-              {(!q.type || q.type === 'text') && (
-                <Input onChange={(e)=>handleChange(q.id, e.target.value)} />
-              )}
+              {renderInput(q)}
             </div>
           ))}
+          {error && <div style={{ color: "red" }}>{error}</div>}
           <div className="flex justify-end">
-            <Button onClick={handleSubmit} disabled={loading}>Submit</Button>
+            <Button onClick={handleSubmit} disabled={submitting || loading}>
+              {submitting ? "Submitting..." : "Submit"}
+            </Button>
           </div>
         </CardContent>
       </Card>
