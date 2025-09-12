@@ -85,6 +85,8 @@ const QuestionnairePage = ({ userId: propUserId }) => {
   };
 
   const handleSubmit = async () => {
+    setSubmitting(true);
+    setError("");
     // Ensure user exists before submitting responses
     let userId = resolvedUserId;
 
