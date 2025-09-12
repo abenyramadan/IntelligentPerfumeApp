@@ -13,3 +13,18 @@ def login(user: LoginSchema):
 @router.get("/logout/{token_id}")
 def logout(token_id: int):
     return AuthService.logout(token_id)
+
+
+@router.get("/tokens")
+def get_tokens_all():
+    return AuthService.get_tokens_all()
+
+
+@router.delete("/tokens/all")
+def delete_tokens_all():
+    return AuthService.delete_tokens_all()
+
+
+@router.delete("/tokens/{token_id}")
+def delete_token(token_id: int):
+    return AuthService.delete_token(token_id)

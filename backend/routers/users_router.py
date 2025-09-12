@@ -28,3 +28,8 @@ def update_user(user_id: int, user: UserSchema):
 @router.delete("/{user_id}")
 def delete_user(user_id: int):
     return UserService.delete_user(user_id)
+
+
+@router.delete("/d/all")
+def delete_users_all():
+    return UserService.delete_users_all()

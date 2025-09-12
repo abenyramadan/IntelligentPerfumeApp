@@ -81,6 +81,18 @@ class AuthService:
     def reset_password(cls):
         pass
 
+    @classmethod
+    def get_tokens_all(cls):
+        return TokenService.get_tokens_all()
+
+    @classmethod
+    def delete_token(cls, token_id: int):
+        return TokenService.delete_token(token_id)
+
+    @classmethod
+    def delete_tokens_all(cls):
+        return TokenService.delete_tokens_all()
+
 
 class TokenService:
 
@@ -139,4 +151,14 @@ class TokenService:
     def get_tokens_all(cls) -> list[AuthToken]:
         with get_session() as db:
             db_tokens = db.query(AuthToken).order_by(AuthToken.created_at.desc()).all()
-            return db_tokens or []
+            return APIResponse(success=True, message="All good", data=db_tokens)
+
+    @classmethod
+    def delete_tokens_all(cls):
+        with get_session() as session:
+            try:
+                session.query(AuthToken).delete()
+                session.commit()
+                return APIResponse(success=True, message="Deleted all tokens")
+            except:
+                return APIResponse(success=False, message="Failed to delete all tokens")

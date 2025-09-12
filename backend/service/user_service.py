@@ -115,7 +115,6 @@ class UserService:
     def get_users_all(cls) -> APIResponse:
         with get_session() as session:
             db_users = session.query(User).all()
-
             if not db_users:
                 db_users = []
             return APIResponse(success=True, message="All good", data=db_users)
@@ -127,7 +126,8 @@ class UserService:
                 session.query(User).delete()
                 session.commit()
                 return APIResponse(success=True, message="Delete all users <:)")
-            except:
+            except Exception as e:
+                print("Something went wrong:", e)
                 return APIResponse(
                     success=False, message="Failed to wipe out all users. Thank God!"
                 )

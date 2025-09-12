@@ -17,11 +17,13 @@ from datetime import datetime
 class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True)
+
+    # personal info
     first_name = Column(String(50), nullable=True, default="")
     last_name = Column(String(100), nullable=True)
     gender = Column(String, nullable=True)
     age_group = Column(String, nullable=True)
-    country_of_origin = (Column(String(100), nullable=True),)
+    # country_of_origin = Column(String(100), nullable=True)
     country_grew_up = Column(String(100), nullable=True)
     country_of_residence = Column(String(100), nullable=True)
 
