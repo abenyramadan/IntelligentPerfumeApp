@@ -127,3 +127,17 @@ class UserProfileService:
 
             db_profiles = session.query(UserProfile).all()
             return APIResponse(success=True, message="All good", data=[db_profiles])
+
+    @classmethod
+    def get_user_profile_user_id(cls, user_id: int) -> APIResponse:
+        with get_session() as session:
+            profile = session.query(UserProfile).filter_by(user_id=user_id).first()
+
+            if not profile:
+                return APIResponse(
+                    success=False, message="Cannot find user profile for given user"
+                )
+
+            return APIResponse(
+                success=True, message="Found user profile", data=[profile]
+            )

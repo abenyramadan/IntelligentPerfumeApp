@@ -18,6 +18,9 @@ from routers.questionnaire_router import router as questionnaire_router
 from routers.auth_router import router as auth_router
 from routers.log_router import router as log_router
 
+from routers.ai_router import router as ai_router
+
+
 from db.populate_db import insert_perfumes
 
 
@@ -100,6 +103,7 @@ app.add_middleware(
 )
 
 
+app.include_router(ai_router)
 app.include_router(perfume_router)
 app.include_router(user_router)
 app.include_router(questionnaire_router)
