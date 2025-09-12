@@ -7,6 +7,7 @@ import HistoryPage from './HistoryPage'
 import QuestionnairePage from './QuestionnairePage'
 import LoginPage from './LoginPage'
 import RegisterPage from './RegisterPage'
+import Dashboard from '../dashboard/dashboard' 
 import { Toaster } from 'sonner'
 
 function App() {

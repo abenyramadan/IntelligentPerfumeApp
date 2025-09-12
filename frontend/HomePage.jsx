@@ -188,7 +188,7 @@ const HomePage = ({ onPageChange, user }) => {
         {user ? (
           <Button 
             size="lg"
-            onClick={() => onPageChange('profile')}
+            onClick={() => onPageChange('questionnaire')}
             className="bg-purple-600 hover:bg-purple-700"
           >
             <Heart className="mr-2 h-5 w-5" />
