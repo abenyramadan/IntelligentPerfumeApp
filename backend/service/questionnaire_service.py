@@ -102,4 +102,4 @@ class QuestionnaireService:
             db_qns = session.query(Questionnaire).all()
             if not db_qns:
                 db_qns = []
-            return APIResponse(success=True, message="ALl good", data=db_qns)
+            return APIResponse(success=True, message="All good", data=db_qns)

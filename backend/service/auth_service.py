@@ -118,9 +118,7 @@ class TokenService:
                 return APIResponse(
                     success=False, message=f"Cannot find token with id: {token_id}"
                 )
-
             try:
-
                 db.delete(db_token)
                 db.commit()
                 return APIResponse(success=True, message="Token deleted successfully")

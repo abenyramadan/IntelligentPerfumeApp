@@ -43,7 +43,7 @@ async def lifespan(app: FastAPI):
 # init main app
 app = FastAPI(
     title="AI Powered Perfume Recommendation API",
-    description="Recommend perfumes based on unique user profile",
+    description="Recommend perfume based on unique user profile such as skin chemistry, mood, preferrences, budget and even environmental factors",
     version="1.0.0",
     contact={
         "name": "Awet Thon",
@@ -91,8 +91,6 @@ async def exception_handler(
 
 
 # CORS middleware
-
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
@@ -122,8 +120,6 @@ def read_home():
 
 
 # populate db
-
-
 @app.get("/populate_db")
 def populate_db():
     insert_perfumes()

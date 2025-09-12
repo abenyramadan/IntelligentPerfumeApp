@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from service.questionnaire_response_service import QuestionnaireResponseService
 from schema.questionnaire_response_schema import QuestionnaireResponseSchema
 
-router = APIRouter(prefix="/questionnaire-responses", tags=["Questionnaire Responses"])
+router = APIRouter(prefix="/questionnaires/responses", tags=["Questionnaire Responses"])
 
 
 @router.get("/")

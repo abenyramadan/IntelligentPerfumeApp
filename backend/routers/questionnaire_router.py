@@ -3,7 +3,7 @@ from service.questionnaire_service import QuestionnaireService
 from schema.questionnaire_schema import QuestionnaireSchema
 
 
-router = APIRouter(prefix="/questionnaires", tags=["Questionnaires"])
+router = APIRouter(prefix="/questionnaires/questions", tags=["Questionnaires"])
 
 
 @router.get("/")

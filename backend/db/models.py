@@ -151,6 +151,24 @@ class Questionnaire(Base):
     question_topic = Column(String)  # Skin Chemistry, preferences, climate etc
     multiple_choices = Column(Text, nullable=False)  # comma seperate multiple choices
     created_at = Column(DateTime, default=datetime.now)
+    type = Column(String, default="radio")  # whether radio, select
+    can_select_multiple = Column(
+        Boolean, default=False
+    )  # whether you can select multiple values
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "question_id": self.question_id,
+            "question_text": self.question_text,
+            "question_topic": self.question_topic,
+            "type": self.type,
+            "multiple_choices": (
+                self.multiple_choices.split(",") if self.multiple_choices else []
+            ),
+            "can_select_multiple": self.can_select_multiple,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+        }
 
 
 class QuestionnaireResponse(Base):
