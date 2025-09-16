@@ -53,17 +53,24 @@ const RecommendationsPage = ({ userId: propUserId }) => {
     setLoading(true)
     try {
       if (userId) {
-        const response = await fetch('http://localhost:5000/api/ai-recommendations', {
+        const payload = {
+          user_id: userId,
+          mood: context.mood,
+          activity: context.activity,
+          primary_climate: context.primary_climate,
+          temperature: context.temperature,
+          humidity: context.humidity
+        }
+        const response = await fetch('GEN_AI_KEY', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ user_id: userId })
+          body: JSON.stringify(payload)
         })
         if (response.ok) {
           const data = await response.json()
-          // If the response is an array of perfumes, wrap each in { perfume: ... }
-          const mapped = Array.isArray(data)
-            ? data.slice(0, 3).map(p => ({ perfume: p }))
-            : [];
+          const mapped = Array.isArray(data.recommendations)
+            ? data.recommendations.slice(0, 3).map(p => ({ perfume: p }))
+            : []
           setRecommendations(mapped)
           toast.success('Personalized recommendations loaded!')
         } else {
@@ -87,14 +94,19 @@ const RecommendationsPage = ({ userId: propUserId }) => {
 
   // Auto-fetch recommendations on mount if userId is present in query
   useEffect(() => {
-    if (userId) {
-      getAIRecommendations()
+    // Check if recommendations are passed from questionnaire
+    const stored = localStorage.getItem('recommendations');
+    if (stored) {
+      setRecommendations(JSON.parse(stored));
+      localStorage.removeItem('recommendations');
+    } else if (userId) {
+      getAIRecommendations();
     }
   }, [userId])
 
   const submitFeedback = async (recommendationId, rating) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/recommendations/${recommendationId}/feedback`, {
+      const response = await fetch(`http://localhost:8000/api/recommendations/${recommendationId}/feedback`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -11,13 +11,18 @@ import {
 } from "./src/components/ui/card";
 import { toast } from "sonner";
 import ApiService from "./services/api.js";
+import { useNavigate } from "react-router-dom";
 
-function RegisterPage({ onPageChange, onRegister }) {
+function RegisterPage({ onRegister }) {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: "",
     email: "",
     password: "",
     confirmPassword: "",
+    firstName: "",
+    lastName: "",
+    phone: "",
   });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -44,41 +49,36 @@ function RegisterPage({ onPageChange, onRegister }) {
         username: formData.username,
         email: formData.email,
         password: formData.password,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        phone: formData.phone,
       });
 
       if (response?.success) {
-        //user created successfully, so make login request in the background
-        const userObj = {
-          user_id: response.data[0]?.user_id,
-          token: response.data[0]?.token,
-          token_type: response.data[0]?.type,
-          username: formData.username,
-        };
-
-        // secret login request
-        const loginRes = ApiService.login({
+        // Secret login request (awaited)
+        const loginRes = await ApiService.login({
           username: formData.username,
           password: formData.password,
         });
 
-        // if login req is succesful
         if (loginRes?.success) {
           const userObj = {
-            user_id: response.data[0]?.user_id,
-            token: response.data[0]?.token,
-            token_type: response.data[0]?.type,
+            user_id: loginRes.data[0]?.user_id,
+            token: loginRes.data[0]?.token,
+            token_type: loginRes.data[0]?.type,
             username: formData.username,
           };
 
           localStorage.setItem("user", JSON.stringify(userObj));
-          toast.success("Login successful!");
-          onPageChange("home");
+          toast.success("Registration successful!");
+          if (onRegister) onRegister(userObj);
+          navigate("/"); // Redirect to home page
+        } else {
+          toast.error(loginRes?.message || "Login failed after registration.");
         }
-
-        onRegister(userObj);
       } else {
         toast.error(
-          response?.message || "Failed to create account. please try again"
+          response?.message || "Failed to create account. Please try again."
         );
       }
     } catch (error) {
@@ -141,6 +141,45 @@ function RegisterPage({ onPageChange, onRegister }) {
             </div>
 
             <div className="space-y-2">
+              <Label htmlFor="firstName">First Name</Label>
+              <Input
+                id="firstName"
+                name="firstName"
+                type="text"
+                placeholder="Enter your first name"
+                value={formData.firstName}
+                onChange={handleInputChange}
+                className="border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="lastName">Last Name</Label>
+              <Input
+                id="lastName"
+                name="lastName"
+                type="text"
+                placeholder="Enter your last name"
+                value={formData.lastName}
+                onChange={handleInputChange}
+                className="border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="phone">Phone</Label>
+              <Input
+                id="phone"
+                name="phone"
+                type="tel"
+                placeholder="Enter your phone number"
+                value={formData.phone}
+                onChange={handleInputChange}
+                className="border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+              />
+            </div>
+
+            <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <Input
                 id="password"
@@ -179,7 +218,7 @@ function RegisterPage({ onPageChange, onRegister }) {
             <div className="text-center">
               <button
                 type="button"
-                onClick={() => onPageChange("login")}
+                onClick={() => navigate("/login")}
                 className="text-sm text-purple-600 hover:text-purple-800 transition-colors"
               >
                 Already have an account? Sign in

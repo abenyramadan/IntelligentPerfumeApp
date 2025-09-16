@@ -54,7 +54,7 @@ const ApiService = {
 
   //
   async submitQuestionnaireResponse(userId, payload) {
-    const res = await fetch(`${API_BASE_URL}/questionnaires/respones/`, {
+    const res = await fetch(`${API_BASE_URL}/questionnaires/responses/`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),

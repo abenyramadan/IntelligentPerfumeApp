@@ -1,18 +1,21 @@
 import { useState } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Home, User, Sparkles, History, Menu, X, LogOut } from 'lucide-react'
 
-const Layout = ({ children, currentPage, onPageChange, onLogout, user }) => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+const navigation = [
+  { id: 'home', name: 'Home', icon: Home, path: '/' },
+  { id: 'profile', name: 'Profile', icon: User, path: '/profile' },
+  { id: 'recommendations', name: 'AI Recommendations', icon: Sparkles, path: '/recommendations' },
+  { id: 'history', name: 'History', icon: History, path: '/history' },
+  { id: 'questionnaire', name: 'Questionnaire', icon: Sparkles, path: '/questionnaire' },
+]
 
-  const navigation = [
-    { id: 'home', name: 'Home', icon: Home },
-    { id: 'profile', name: 'Profile', icon: User },
-    { id: 'recommendations', name: 'AI Recommendations', icon: Sparkles },
-    { id: 'history', name: 'History', icon: History },
-    { id: 'questionnaire', name: 'Questionnaire', icon: Sparkles },
-  ]
+const Layout = ({ children, onLogout, user }) => {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const navigate = useNavigate()
+  const location = useLocation()
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen)
@@ -35,11 +38,12 @@ const Layout = ({ children, currentPage, onPageChange, onLogout, user }) => {
               <div className="ml-10 flex items-baseline space-x-4">
                 {navigation.map((item) => {
                   const Icon = item.icon
+                  const isActive = location.pathname === item.path
                   return (
                     <Button
                       key={item.id}
-                      variant={currentPage === item.id ? "default" : "ghost"}
-                      onClick={() => onPageChange(item.id)}
+                      variant={isActive ? "default" : "ghost"}
+                      onClick={() => navigate(item.path)}
                       className="flex items-center space-x-2"
                     >
                       <Icon className="h-4 w-4" />
@@ -93,12 +97,13 @@ const Layout = ({ children, currentPage, onPageChange, onLogout, user }) => {
               
               {navigation.map((item) => {
                 const Icon = item.icon
+                const isActive = location.pathname === item.path
                 return (
                   <Button
                     key={item.id}
-                    variant={currentPage === item.id ? "default" : "ghost"}
+                    variant={isActive ? "default" : "ghost"}
                     onClick={() => {
-                      onPageChange(item.id)
+                      navigate(item.path)
                       setIsMobileMenuOpen(false)
                     }}
                     className="w-full justify-start flex items-center space-x-2"
@@ -135,14 +140,15 @@ const Layout = ({ children, currentPage, onPageChange, onLogout, user }) => {
 
       {/* Mobile Bottom Navigation */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg">
-        <div className="grid grid-cols-4 gap-1 p-2">
+        <div className="grid grid-cols-5 gap-1 p-2">
           {navigation.map((item) => {
             const Icon = item.icon
+            const isActive = location.pathname === item.path
             return (
               <Button
                 key={item.id}
-                variant={currentPage === item.id ? "default" : "ghost"}
-                onClick={() => onPageChange(item.id)}
+                variant={isActive ? "default" : "ghost"}
+                onClick={() => navigate(item.path)}
                 className="flex flex-col items-center space-y-1 h-16 text-xs"
                 size="sm"
               >
@@ -159,6 +165,9 @@ const Layout = ({ children, currentPage, onPageChange, onLogout, user }) => {
     </div>
   )
 }
+
+
+
 
 export default Layout
 
