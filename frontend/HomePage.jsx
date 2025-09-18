@@ -1,68 +1,87 @@
-import { useState, useEffect } from 'react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Sparkles, Droplets, Sun, Wind, Heart, Star, LogIn, UserPlus, User, History } from 'lucide-react'
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  Sparkles,
+  Droplets,
+  Sun,
+  Wind,
+  Heart,
+  Star,
+  LogIn,
+  UserPlus,
+  User,
+  History,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const HomePage = ({ onPageChange, user }) => {
-  const [dailyRecommendation, setDailyRecommendation] = useState(null)
-  const [loading, setLoading] = useState(false)
+  const [dailyRecommendation, setDailyRecommendation] = useState(null);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const quickActions = [
     {
-      title: 'Create/Update Profile',
-      description: 'Refine your preferences and skin profile',
+      title: "Create/Update Profile",
+      description: "Refine your preferences and skin profile",
       icon: <User className="h-6 w-6 text-purple-600" />,
-      action: () => navigate('./profile'),
-      color: 'bg-purple-100'
+      action: () => navigate("./profile"),
+      color: "bg-purple-100",
     },
     {
-      title: 'Try AI Recommendation',
-      description: 'Get a personalized scent suggestion',
+      title: "Try AI Recommendation",
+      description: "Get a personalized scent suggestion",
       icon: <Sparkles className="h-6 w-6 text-pink-500" />,
-      action: () => navigate('./recommendations'),
-      color: 'bg-pink-100'
+      action: () => navigate("./recommendations"),
+      color: "bg-pink-100",
     },
     {
-      title: 'View History',
-      description: 'See your past recommendations and ratings',
+      title: "View History",
+      description: "See your past recommendations and ratings",
       icon: <History className="h-6 w-6 text-blue-500" />,
-      action: () => navigate('./history'),
-      color: 'bg-blue-100'
-    }
-  ]
+      action: () => navigate("./history"),
+      color: "bg-blue-100",
+    },
+  ];
 
   const features = [
     {
-      title: 'AI-Powered Matching',
-      description: 'Advanced algorithms analyze your skin chemistry, preferences, and environment',
-      icon: Sparkles
+      title: "AI-Powered Matching",
+      description:
+        "Advanced algorithms analyze your skin chemistry, preferences, and environment",
+      icon: Sparkles,
     },
     {
-      title: 'Personalized Profiles',
-      description: 'Detailed questionnaire captures your unique characteristics',
-      icon: Droplets
+      title: "Personalized Profiles",
+      description:
+        "Detailed questionnaire captures your unique characteristics",
+      icon: Droplets,
     },
     {
-      title: 'Daily Recommendations',
-      description: 'Context-aware suggestions based on weather, mood, and activities',
-      icon: Sun
+      title: "Daily Recommendations",
+      description:
+        "Context-aware suggestions based on weather, mood, and activities",
+      icon: Sun,
     },
     {
-      title: 'Performance Prediction',
-      description: 'Predict longevity, projection, and sillage for your skin',
-      icon: Wind
-    }
-  ]
+      title: "Performance Prediction",
+      description: "Predict longevity, projection, and sillage for your skin",
+      icon: Wind,
+    },
+  ];
+
+  const capitalize = (name) => {
+    name = String(name);
+    return name.charAt(0).toUpperCase() + name.slice(1);
+  };
 
   return (
     <div className="max-w-5xl mx-auto py-12 px-4">
       {/* Welcome Section */}
       <div className="text-center mb-10">
         <h1 className="text-4xl font-bold text-purple-700 mb-2">
-          Welcome back, {user?.username || "Scent Lover"}!
+          Welcome back, {capitalize(user?.username) || "Scent Lover"}!
         </h1>
         <p className="text-lg text-gray-600">
           Ready to discover your next favorite fragrance?
@@ -83,7 +102,7 @@ const HomePage = ({ onPageChange, user }) => {
                 <h3 className="text-xl font-semibold mb-1">{action.title}</h3>
                 <p className="text-gray-600">{action.description}</p>
               </div>
-            )
+            );
           })}
         </div>
       )}
@@ -94,11 +113,12 @@ const HomePage = ({ onPageChange, user }) => {
           Your Personalized Scent Journey
         </h2>
         <p className="text-gray-700 mb-6">
-          Explore recommendations, update your profile, and track your favorites. ScentAI learns and adapts to your preferences every day!
+          Explore recommendations, update your profile, and track your
+          favorites. ScentAI learns and adapts to your preferences every day!
         </p>
         <Button
           size="lg"
-          onClick={() => navigate('recommendations')}
+          onClick={() => navigate("recommendations")}
           className="bg-gradient-to-r from-purple-600 to-pink-500 text-white"
         >
           <Sparkles className="mr-2 h-5 w-5" />
@@ -113,16 +133,18 @@ const HomePage = ({ onPageChange, user }) => {
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {features.map((feature, index) => {
-            const Icon = feature.icon
+            const Icon = feature.icon;
             return (
               <div key={index} className="text-center space-y-4">
                 <div className="mx-auto w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center">
                   <Icon className="h-8 w-8 text-purple-600" />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900">{feature.title}</h3>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {feature.title}
+                </h3>
                 <p className="text-gray-600 text-sm">{feature.description}</p>
               </div>
-            )
+            );
           })}
         </div>
       </div>
@@ -151,12 +173,13 @@ const HomePage = ({ onPageChange, user }) => {
           Ready to Discover Your Signature Scent?
         </h2>
         <p className="text-gray-600 mb-6">
-          Join thousands of fragrance enthusiasts who trust ScentAI for their daily scent selection.
+          Join thousands of fragrance enthusiasts who trust ScentAI for their
+          daily scent selection.
         </p>
         {user ? (
-          <Button 
+          <Button
             size="lg"
-            onClick={() => navigate('./profile')}
+            onClick={() => navigate("./profile")}
             className="bg-purple-600 hover:bg-purple-700"
           >
             <Heart className="mr-2 h-5 w-5" />
@@ -164,7 +187,7 @@ const HomePage = ({ onPageChange, user }) => {
           </Button>
         ) : (
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button 
+            <Button
               size="lg"
               onClick={() => navigate("/register")}
               className="bg-purple-600 hover:bg-purple-700"
@@ -172,7 +195,7 @@ const HomePage = ({ onPageChange, user }) => {
               <UserPlus className="mr-2 h-5 w-5" />
               Get Started Free
             </Button>
-            <Button 
+            <Button
               size="lg"
               variant="outline"
               onClick={() => navigate("/login")}
@@ -184,8 +207,7 @@ const HomePage = ({ onPageChange, user }) => {
         )}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default HomePage
-
+export default HomePage;

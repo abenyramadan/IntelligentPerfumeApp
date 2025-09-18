@@ -36,3 +36,9 @@ export const convertToArray = (string, seperator = ",") => {
   const values = string.split(seperator);
   return values;
 };
+
+// capitalize a sting
+export const capitalize = (name) => {
+  name = String(name);
+  return name.charAt(0).toUpperCase() + name.slice(1);
+};
