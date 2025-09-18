@@ -105,6 +105,9 @@ const QuestionnairePage = ({ userId: propUserId }) => {
 
   return (
     <div className="max-w-3xl mx-auto space-y-8">
+      <h2 className="text-4xl font-semibold">
+        Let's get to know you <span className="text-purple-600">first</span>
+      </h2>
       {questions.map((question, idx) => (
         <>
           {topicId == idx && (
