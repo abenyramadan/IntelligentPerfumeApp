@@ -10,6 +10,11 @@ def get_questionnaire_responses_all():
     return QuestionnaireResponseService.get_questionnaire_respones_all()
 
 
+@router.get("/delete/all")
+def wipe_all():
+    return QuestionnaireResponseService.delete_qn_responses_all()
+
+
 # get single qn response
 
 

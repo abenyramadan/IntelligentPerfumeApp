@@ -1,4 +1,4 @@
-from schema.user_profile_schema import UserProfileSchema
+from schema.user_profile_schema import UserProfileSchema, ProfilePayload
 from schema.ai_response_schema import AIResponseSchema
 from service.user_profile_service import UserProfileService
 from schema.response_schema import APIResponse
@@ -87,6 +87,30 @@ class AIService:
             return APIResponse(
                 success=False, status_code=500, message="Something went wrong"
             )
+
+    @classmethod
+    def build_user_profile(cls, payload: ProfilePayload):
+
+        prompt = f"""
+        Use answers to the following questions to build user profile. 
+        questions:{payload.questions}
+        answer: {payload.answers}
+        """
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt,
+            config={
+                "response_mime_type": "application/json",
+                "response_schema": UserProfileSchema,
+            },
+        )
+
+        response_data = json.loads(response.text)
+        print(response_data)
+
+        return APIResponse(
+            success=True, message="Built user profile", data=[response_data]
+        )
 
     @classmethod
     def get_perfume_image(perfume_name: str):

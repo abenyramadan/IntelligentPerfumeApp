@@ -1,6 +1,12 @@
 from pydantic import BaseModel
 
 
+class ProfilePayload(BaseModel):
+    user_id: int
+    questions: list
+    answers: list
+
+
 class UserProfileSchema(BaseModel):
     user_id: int
 
@@ -23,7 +29,7 @@ class UserProfileSchema(BaseModel):
     # user preferences
     preferred_families: str | None = None  # comma seperated values
     disliked_families: str | None = None  # same comma seperated
-    preferred_instensity: str  # skin scent, moderate, strong
+    preferred_intensity: str  # skin scent, moderate, strong
     longevity_target: int  # hours
     gender_presentation: str  # feminine, masculine unisex
     preferred_character: str | None = None  # fresh/clean, smooth/creamy

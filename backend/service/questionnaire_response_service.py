@@ -13,6 +13,8 @@ class QuestionnaireResponseService:
         with get_session() as session:
 
             try:
+                print("+++++++++++++++++++++++++++++++++++++++++")
+                print("creating questionnnaire response")
 
                 questionnaire_item = QuestionnaireResponse(
                     **questionnaire_response.dict()
@@ -21,10 +23,13 @@ class QuestionnaireResponseService:
                 session.commit()
                 session.refresh(questionnaire_item)
 
+                print("Response saved")
                 return APIResponse(
                     success=True, message="Questionnaire response saved successfully"
                 )
-            except:
+            except Exception as e:
+                print("Something went wrong", e)
+
                 return APIResponse(
                     status_code=500,
                     success=False,

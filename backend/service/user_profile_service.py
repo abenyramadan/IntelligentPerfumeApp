@@ -5,29 +5,46 @@ from schema.response_schema import APIResponse
 
 
 class UserProfileService:
+
     @classmethod
     def create_user_profile(cls, profile: UserProfileSchema) -> APIResponse:
         with get_session() as session:
 
+            print("-----------------------------------")
+            print("got this profile", profile)
+
+            user_id = (
+                profile["user_id"] if isinstance(profile, dict) else profile.user_id
+            )
             # one user cannot have more than one profile
             db_user_profile = (
-                session.query(UserProfile).filter_by(user_id=profile.user_id).first()
+                session.query(UserProfile).filter_by(user_id=user_id).first()
             )
 
             if db_user_profile:
                 return APIResponse(
                     success=False,
-                    message=f"User with id: {profile.user_id} already has a profile",
+                    message=f"User with id: {user_id} already has a profile",
                 )
 
             else:
 
                 try:
-                    new_profile = UserProfile(**profile.dict())
+                    print("trying to create profile...............")
+                    if isinstance(profile, dict):
+
+                        new_profile = UserProfile(**profile)
+                    else:
+                        new_profile = UserProfile(**profile.dict())
                     session.add(new_profile)
                     session.commit()
-                    return new_profile
-                except:
+
+                    print("user profile created successfully")
+                    return APIResponse(
+                        success=True, message="User profile created successfully"
+                    )
+                except Exception as e:
+                    print("Failed to create user profile", e)
                     return APIResponse(
                         success=False, message="Failed to create profile"
                     )
