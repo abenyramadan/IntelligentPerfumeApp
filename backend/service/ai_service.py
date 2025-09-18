@@ -24,46 +24,30 @@ class AIService:
     @classmethod
     def get_recommendation(cls, payload: AIRecPayloadSchema):
 
-        # res = UserProfileService.get_user_profile_user_id(payload.user_id)
+        res = UserProfileService.get_user_profile_user_id(payload.user_id)
 
-        # if not res.success:
-        #     return APIResponse(success=False, message=res.message)
-        data = [
-            {
-                "skin_type": "Dry",
-                "skin_temperature": "Neutral",
-                "skin_hydration": "Medium",
-                "primary_climate": "Hot & Humid",
-                "avg_temperature": "26-32",
-                "typical_environment": "Outdoor",
-                "preferred_families": ["Fruity", "Aromatic"],
-                "disliked_families": ["Amber", "Spicy"],
-                "preferred_intensity": "Strong",
-                "longevity_target": "5",
-                "gender_presentation": "Masculine",
-                "preferred_character": "Fresh/Clean",
-                "spray_location": "Skin & clothes",
-                "budget_min": 30,
-                "budget_max": 95,
-            }
-        ]
+        if not res.success:
+            return APIResponse(success=False, message=res.message)
+
         try:
-            user_profile = data[0]
+            user_profile = res.data[0].to_dict()
+
+            print("user profile", user_profile)
+
             prompt = f"""
                         Recommend perfume based on user unique profile, current mood, activity and current weather condition
-                        when you get the perfume now seach web to find perfume exact image and put its url in image_url
-                        
                         mood: {payload.mood}
                         activity: {payload.activity}
                         primary_climate: {payload.primary_climate}
                         temperature: {payload.temperature}
                         humidity:{payload.humidity}
-                        user_profile: {user_profile}
-                        
+                        user_profile: {user_profile} 
                     """
 
             print("=================================================")
-            # print("Prompt", prompt)
+            print("Prompt", prompt)
+
+            print("Geting recommendation.............................")
 
             response = client.models.generate_content(
                 model="gemini-2.5-flash",
@@ -80,12 +64,12 @@ class AIService:
             # web_res = AIService.get_perfume_image(response_data["perfume"])
 
             return APIResponse(
-                success=True, message="Got recommendation", data=[response.text]
+                success=True, message="Got recommendation", data=[response_data]
             )
         except Exception as e:
             print("something went wrong", e)
             return APIResponse(
-                success=False, status_code=500, message="Something went wrong"
+                success=False, status_code=500, message="Something went wrong on server"
             )
 
     @classmethod
