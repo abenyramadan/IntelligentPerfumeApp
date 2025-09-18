@@ -18,14 +18,13 @@ import { toast } from "sonner";
 
 import { convertToArray, groupDataByKey } from "./utils/utils.js";
 import { ArrowLeft, ArrowRight } from "lucide-react";
-import { API_BASE_URL } from "./constants/constants.js";
 
 const getCurrentUserId = () => {
   try {
     const u = JSON.parse(localStorage.getItem("user"));
-    return u?.user_id || null;
+    return u?.id || 1;
   } catch {
-    return null;
+    return 1;
   }
 };
 
@@ -50,19 +49,16 @@ const QuestionnairePage = ({ userId: propUserId }) => {
         if (res?.success) {
           // Check if groupedData is already an object or needs parsing
           let groupedData;
-
-          localStorage.setItem("questionnaire", JSON.stringify(res.data));
           try {
             // Try to parse if it's a string, otherwise use directly
-            groupedData =
-              typeof res.data === "string" ? JSON.parse(res.data) : res.data;
+            groupedData = typeof res.data === 'string' ? JSON.parse(res.data) : res.data;
           } catch (e) {
             console.error("Error parsing data:", e);
             groupedData = res.data;
           }
-
+          
           console.log("Grouped data", groupedData);
-
+          
           // Ensure the data has the expected structure
           if (Array.isArray(groupedData)) {
             // Group questions by topic
@@ -73,19 +69,13 @@ const QuestionnairePage = ({ userId: propUserId }) => {
               return acc;
             }, {});
             // Convert to array of { topic, questions }
-            const topicsArray = Object.entries(groupedByTopic).map(
-              ([topic, questions]) => ({
-                topic,
-                questions,
-              })
-            );
+            const topicsArray = Object.entries(groupedByTopic).map(([topic, questions]) => ({
+              topic,
+              questions,
+            }));
             setQuestions(topicsArray);
           } else {
-            console.error(
-              "Expected array but got:",
-              typeof groupedData,
-              groupedData
-            );
+            console.error("Expected array but got:", typeof groupedData, groupedData);
             toast.error("Invalid data format received");
           }
         } else {
@@ -131,9 +121,6 @@ const QuestionnairePage = ({ userId: propUserId }) => {
 
   const handleSubmit = async () => {
     setSubmitting(true);
-
-    let answer_data = [];
-
     try {
       const userId = Number(getCurrentUserId());
 
@@ -159,55 +146,35 @@ const QuestionnairePage = ({ userId: propUserId }) => {
           answer_json,
         };
 
-        answer_data.push(responseObj);
+        const response = await fetch('http://127.0.0.1:8000/questionnaires/responses/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(responseObj),
+        });
 
-        console.log("Creating questionnaire response", responseObj);
-
-        const response = await fetch(
-          "http://127.0.0.1:8000/questionnaires/responses/",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(responseObj),
-          }
-        );
-
-        // if (!response.success) {
-        //   toast.error(`Failed to save response for question ${question_id}`);
-        //   setSubmitting(false);
-        //   return;
-        // }
+        if (!response.ok) {
+          toast.error(`Failed to save response for question ${question_id}`);
+          setSubmitting(false);
+          return;
+        }
       }
-      let question_data = JSON.parse(localStorage.getItem("questionnaire"));
-      console.log("questions: ", question_data);
-      console.log("answers", answer_data);
-
-      const profile_url = API_BASE_URL + "/profiles/create/profile";
-
-      console.log("trying to create profile..................");
 
       // Create user profile by user_id only
-      const profileRes = await fetch(profile_url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          user_id: userId,
-          questions: question_data,
-          answers: answer_data,
-        }),
+      const profileRes = await fetch('http://127.0.0.1:8000/profiles/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: userId }),
       });
 
-      console.log("create profile response: ", profileRes);
-
-      // if (profileRes.ok) {
-      //   setProfileCreated(true);
-      //   setShowProfile(true);
-      //   toast.success("Profile created!");
-      // } else {
-      //   toast.error("Failed to create user profile");
-      // }
+      if (profileRes.ok) {
+        setProfileCreated(true);
+        setShowProfile(true);
+        toast.success("Profile created!");
+      } else {
+        toast.error("Failed to create user profile");
+      }
     } catch (error) {
-      toast.error("An error occurred");
+      toast.error('An error occurred');
     } finally {
       setSubmitting(false);
     }
@@ -215,20 +182,17 @@ const QuestionnairePage = ({ userId: propUserId }) => {
 
   const handleGetRecommendation = async () => {
     const userId = Number(getCurrentUserId());
-    const recResponse = await fetch(
-      "http://127.0.0.1:8000/recommendations/ai",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user_id: userId }),
-      }
-    );
+    const recResponse = await fetch('http://127.0.0.1:8000/recommendations/ai', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: userId }),
+    });
     if (recResponse.ok) {
       const recs = await recResponse.json();
       setRecommendation(recs);
-      toast.success("Recommendation loaded!");
+      toast.success('Recommendation loaded!');
     } else {
-      toast.error("Failed to get recommendations");
+      toast.error('Failed to get recommendations');
     }
   };
 
@@ -261,67 +225,48 @@ const QuestionnairePage = ({ userId: propUserId }) => {
           <CardContent>
             {questions.map((q) => (
               <div key={`question-${q.id}`} className="mb-6">
-                <Label
-                  htmlFor={q.id}
-                  className="font-semibold md:text-xl block mb-3"
-                >
+                <Label htmlFor={q.id} className="font-semibold md:text-xl block mb-3">
                   {q.question_id ? `${q.question_id}. ` : ""}
                   {q.question_text || "Question"}
                 </Label>
 
                 {/* Multiple choice selection */}
-                {["select", "radio"].includes(q.type) &&
-                  q.can_select_multiple && (
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
-                      {q.multiple_choices &&
-                        convertToArray(q.multiple_choices).map((opt) => (
-                          <div
-                            key={`option-${q.id}-${opt}`}
-                            className="flex items-center space-x-2"
-                          >
-                            <Checkbox
-                              id={`${q.id}-${opt}`}
-                              checked={(answers[q.id] || []).includes(opt)}
-                              onCheckedChange={() =>
-                                toggleMultiSelect(q.id, opt, q.max)
-                              }
-                            />
-                            <Label
-                              htmlFor={`${q.id}-${opt}`}
-                              className="text-sm cursor-pointer"
-                            >
-                              {opt}
-                            </Label>
-                          </div>
-                        ))}
-                    </div>
-                  )}
+                {["select", "radio"].includes(q.type) && q.can_select_multiple && (
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
+                    {q.multiple_choices &&
+                      convertToArray(q.multiple_choices).map((opt) => (
+                        <div key={`option-${q.id}-${opt}`} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={`${q.id}-${opt}`}
+                            checked={(answers[q.id] || []).includes(opt)}
+                            onCheckedChange={() => toggleMultiSelect(q.id, opt, q.max)}
+                          />
+                          <Label htmlFor={`${q.id}-${opt}`} className="text-sm cursor-pointer">
+                            {opt}
+                          </Label>
+                        </div>
+                      ))}
+                  </div>
+                )}
 
                 {/* Single choice selection */}
-                {["select", "radio"].includes(q.type) &&
-                  !q.can_select_multiple && (
-                    <div className="space-y-2 mt-2">
-                      {q.multiple_choices &&
-                        convertToArray(q.multiple_choices).map((opt) => (
-                          <div
-                            key={`single-${q.id}-${opt}`}
-                            className="flex items-center space-x-2"
-                          >
-                            <Checkbox
-                              id={`${q.id}-${opt}`}
-                              checked={answers[q.id] === opt}
-                              onCheckedChange={() => handleChange(q.id, opt)}
-                            />
-                            <Label
-                              htmlFor={`${q.id}-${opt}`}
-                              className="text-sm cursor-pointer"
-                            >
-                              {opt}
-                            </Label>
-                          </div>
-                        ))}
-                    </div>
-                  )}
+                {["select", "radio"].includes(q.type) && !q.can_select_multiple && (
+                  <div className="space-y-2 mt-2">
+                    {q.multiple_choices &&
+                      convertToArray(q.multiple_choices).map((opt) => (
+                        <div key={`single-${q.id}-${opt}`} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={`${q.id}-${opt}`}
+                            checked={answers[q.id] === opt}
+                            onCheckedChange={() => handleChange(q.id, opt)}
+                          />
+                          <Label htmlFor={`${q.id}-${opt}`} className="text-sm cursor-pointer">
+                            {opt}
+                          </Label>
+                        </div>
+                      ))}
+                  </div>
+                )}
 
                 {/* Number input */}
                 {q.type === "number" && (
@@ -363,39 +308,38 @@ const QuestionnairePage = ({ userId: propUserId }) => {
       <div className="max-w-3xl mx-auto space-y-8">
         <Card>
           <CardHeader>
-            <CardTitle>Your Profile</CardTitle>
+            <CardTitle>Your Profile is here</CardTitle>
           </CardHeader>
           <CardContent>
-            <ul className="mb-6">
+            <ul>
               {Object.entries(answers).map(([k, v]) => (
                 <li key={k}>
-                  <b>{k.replace(/_/g, " ")}:</b>{" "}
-                  {Array.isArray(v) ? v.join(", ") : v}
+                  <b>{k.replace(/_/g, " ")}:</b> {Array.isArray(v) ? v.join(", ") : v}
                 </li>
               ))}
             </ul>
-            <div className="flex gap-4">
+            <div className="flex gap-4 mt-6">
               <Button onClick={handleGetRecommendation}>
-                Get Recommendations
+                Get Recommendation
               </Button>
               <Button variant="outline" onClick={() => setShowProfile(false)}>
-                Update Profile
+                Update Your Profile
               </Button>
             </div>
             {recommendation && (
               <div className="mt-6 p-4 border rounded">
                 <h3 className="font-bold mb-2">Your Recommendation</h3>
-                {Array.isArray(recommendation.recommendations) ? (
-                  recommendation.recommendations.map((rec, idx) => (
-                    <div key={idx} className="mb-4">
-                      <b>Perfume:</b> {rec.perfume_name || rec.name} <br />
-                      <b>Brand:</b> {rec.brand} <br />
-                      <b>Notes:</b> {rec.notes || "-"}
-                    </div>
-                  ))
-                ) : (
-                  <div>{JSON.stringify(recommendation)}</div>
-                )}
+                {/* Display recommendation details */}
+                {Array.isArray(recommendation.recommendations)
+                  ? recommendation.recommendations.map((rec, idx) => (
+                      <div key={idx} className="mb-4">
+                        <b>Perfume:</b> {rec.perfume_name || rec.name} <br />
+                        <b>Brand:</b> {rec.brand} <br />
+                        <b>Notes:</b> {rec.notes || "-"}
+                      </div>
+                    ))
+                  : <div>{JSON.stringify(recommendation)}</div>
+                }
               </div>
             )}
           </CardContent>
@@ -406,9 +350,6 @@ const QuestionnairePage = ({ userId: propUserId }) => {
 
   return (
     <div className="max-w-3xl mx-auto space-y-8">
-      <h2 className="text-4xl font-semibold">
-        Let's get to know you <span className="text-purple-600">first</span>
-      </h2>
       {questions.map((question, idx) => (
         <React.Fragment key={`topic-${idx}`}>
           {topicId === idx && (
@@ -421,65 +362,43 @@ const QuestionnairePage = ({ userId: propUserId }) => {
                 {question.questions && Array.isArray(question.questions) ? (
                   question.questions.map((q) => (
                     <div key={`question-${q.id}`} className="mb-6">
-                      <Label
-                        htmlFor={q.id}
-                        className="font-semibold md:text-xl block mb-3"
-                      >
-                        {q.question_id ? `${q.question_id}. ` : ""}
-                        {q.question_text || "Question"}
+                      <Label htmlFor={q.id} className="font-semibold md:text-xl block mb-3">
+                        {q.question_id ? `${q.question_id}. ` : ""}{q.question_text || "Question"}
                       </Label>
 
                       {/* Multiple choice selection */}
                       {q.type === "select" && q.can_select_multiple && (
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
-                          {q.multiple_choices &&
-                            convertToArray(q.multiple_choices).map((opt) => (
-                              <div
-                                key={`option-${q.id}-${opt}`}
-                                className="flex items-center space-x-2"
-                              >
-                                <Checkbox
-                                  id={`${q.id}-${opt}`}
-                                  checked={(answers[q.id] || []).includes(opt)}
-                                  onCheckedChange={() =>
-                                    toggleMultiSelect(q.id, opt, q.max)
-                                  }
-                                />
-                                <Label
-                                  htmlFor={`${q.id}-${opt}`}
-                                  className="text-sm cursor-pointer"
-                                >
-                                  {opt}
-                                </Label>
-                              </div>
-                            ))}
+                          {q.multiple_choices && convertToArray(q.multiple_choices).map((opt) => (
+                            <div key={`option-${q.id}-${opt}`} className="flex items-center space-x-2">
+                              <Checkbox
+                                id={`${q.id}-${opt}`}
+                                checked={(answers[q.id] || []).includes(opt)}
+                                onCheckedChange={() => toggleMultiSelect(q.id, opt, q.max)}
+                              />
+                              <Label htmlFor={`${q.id}-${opt}`} className="text-sm cursor-pointer">
+                                {opt}
+                              </Label>
+                            </div>
+                          ))}
                         </div>
                       )}
 
                       {/* Single choice selection */}
                       {q.type === "select" && !q.can_select_multiple && (
                         <div className="space-y-2 mt-2">
-                          {q.multiple_choices &&
-                            convertToArray(q.multiple_choices).map((opt) => (
-                              <div
-                                key={`single-${q.id}-${opt}`}
-                                className="flex items-center space-x-2"
-                              >
-                                <Checkbox
-                                  id={`${q.id}-${opt}`}
-                                  checked={answers[q.id] === opt}
-                                  onCheckedChange={() =>
-                                    handleChange(q.id, opt)
-                                  }
-                                />
-                                <Label
-                                  htmlFor={`${q.id}-${opt}`}
-                                  className="text-sm cursor-pointer"
-                                >
-                                  {opt}
-                                </Label>
-                              </div>
-                            ))}
+                          {q.multiple_choices && convertToArray(q.multiple_choices).map((opt) => (
+                            <div key={`single-${q.id}-${opt}`} className="flex items-center space-x-2">
+                              <Checkbox
+                                id={`${q.id}-${opt}`}
+                                checked={answers[q.id] === opt}
+                                onCheckedChange={() => handleChange(q.id, opt)}
+                              />
+                              <Label htmlFor={`${q.id}-${opt}`} className="text-sm cursor-pointer">
+                                {opt}
+                              </Label>
+                            </div>
+                          ))}
                         </div>
                       )}
 
@@ -507,9 +426,7 @@ const QuestionnairePage = ({ userId: propUserId }) => {
                     </div>
                   ))
                 ) : (
-                  <div className="text-gray-500">
-                    No questions available for this topic.
-                  </div>
+                  <div className="text-gray-500">No questions available for this topic.</div>
                 )}
 
                 <div className="flex justify-end gap-3 mt-6">
