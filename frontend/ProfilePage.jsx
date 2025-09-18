@@ -63,9 +63,6 @@ const ProfilePage = ({ userId }) => {
           userId={resolvedUserId}
           onProfileCreated={handleProfileCreated}
         />
-        <div style={{ marginTop: "2em" }}>
-          <Chatbox />
-        </div>
       </div>
     );
   }
