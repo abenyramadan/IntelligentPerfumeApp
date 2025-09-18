@@ -18,8 +18,24 @@ def get_user_profile_by(profile_id: int):
 
 # create profile
 @router.post("/")
-def create_user_profile(profile: UserProfileSchema):
-    return UserProfileService.create_user_profile(profile)
+def create_user_profile(data: dict):
+    user_id = data["user_id"]
+
+    # Dummy implementation for get_all_responses_for_user
+    def get_all_responses_for_user(user_id):
+        # Replace this with actual logic to fetch responses for the user
+        return {}
+
+    # Dummy implementation for map_responses_to_profile_fields
+    def map_responses_to_profile_fields(responses):
+        # Replace this with actual logic to map responses to profile fields
+        return {}
+
+    responses = get_all_responses_for_user(user_id)  # implement this
+    profile_fields = map_responses_to_profile_fields(responses)  # implement this
+    profile = UserProfileSchema(user_id=user_id, **profile_fields)
+    UserProfileService.save_profile(profile)
+    return {"success": True, "profile": profile}
 
 
 # update profile

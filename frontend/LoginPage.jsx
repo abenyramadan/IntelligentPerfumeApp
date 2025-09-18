@@ -3,6 +3,7 @@ import ApiService from "./services/api.js";
 import { Button } from "./src/components/ui/button";
 import { Input } from "./src/components/ui/input";
 import { Label } from "./src/components/ui/label";
+import { useNavigate } from "react-router-dom";
 import {
   Card,
   CardContent,
@@ -12,12 +13,13 @@ import {
 } from "./src/components/ui/card";
 import { toast } from "sonner";
 
-function LoginPage({ onPageChange, onLogin }) {
+function LoginPage({ onLogin }) {
   const [formData, setFormData] = useState({
     username: "",
     password: "",
   });
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -41,7 +43,7 @@ function LoginPage({ onPageChange, onLogin }) {
         localStorage.setItem("user", JSON.stringify(userObj));
         onLogin(userObj);
         toast.success("Login successful!");
-        onPageChange("home");
+        navigate("/");
       } else {
         toast.error(response?.message || "Login failed. please try again");
       }
@@ -115,7 +117,7 @@ function LoginPage({ onPageChange, onLogin }) {
             <div className="text-center">
               <button
                 type="button"
-                onClick={() => onPageChange("register")}
+                onClick={() => navigate("/register")}
                 className="text-sm text-purple-600 hover:text-purple-800 transition-colors"
               >
                 Don't have an account? Sign up

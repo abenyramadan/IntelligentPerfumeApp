@@ -2,33 +2,35 @@ import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Sparkles, Droplets, Sun, Wind, Heart, Star, LogIn, UserPlus } from 'lucide-react'
+import { Sparkles, Droplets, Sun, Wind, Heart, Star, LogIn, UserPlus, User, History } from 'lucide-react'
+import { useNavigate } from "react-router-dom";
 
 const HomePage = ({ onPageChange, user }) => {
   const [dailyRecommendation, setDailyRecommendation] = useState(null)
   const [loading, setLoading] = useState(false)
+  const navigate = useNavigate();
 
   const quickActions = [
     {
-      title: 'Get Daily Recommendation',
-      description: 'AI-powered perfume suggestion for today',
-      icon: Sparkles,
-      color: 'bg-purple-500',
-      action: () => onPageChange('recommendations')
+      title: 'Create/Update Profile',
+      description: 'Refine your preferences and skin profile',
+      icon: <User className="h-6 w-6 text-purple-600" />,
+      action: () => navigate('./profile'),
+      color: 'bg-purple-100'
     },
     {
-      title: 'Update Profile',
-      description: 'Refine your preferences and skin profile',
-      icon: Droplets,
-      color: 'bg-blue-500',
-      action: () => onPageChange('profile')
+      title: 'Try AI Recommendation',
+      description: 'Get a personalized scent suggestion',
+      icon: <Sparkles className="h-6 w-6 text-pink-500" />,
+      action: () => navigate('./recommendations'),
+      color: 'bg-pink-100'
     },
     {
       title: 'View History',
       description: 'See your past recommendations and ratings',
-      icon: Star,
-      color: 'bg-pink-500',
-      action: () => onPageChange('history')
+      icon: <History className="h-6 w-6 text-blue-500" />,
+      action: () => navigate('./history'),
+      color: 'bg-blue-100'
     }
   ]
 
@@ -56,87 +58,53 @@ const HomePage = ({ onPageChange, user }) => {
   ]
 
   return (
-    <div className="space-y-8">
-      {/* Hero Section */}
-      <div className="text-center space-y-4">
-        <h1 className="text-4xl font-bold text-gray-900 sm:text-5xl md:text-6xl">
-          Find Your Perfect
-          <span className="text-purple-600"> Scent</span>
+    <div className="max-w-5xl mx-auto py-12 px-4">
+      {/* Welcome Section */}
+      <div className="text-center mb-10">
+        <h1 className="text-4xl font-bold text-purple-700 mb-2">
+          Welcome back, {user?.username || "Scent Lover"}!
         </h1>
-        <p className="max-w-2xl mx-auto text-xl text-gray-600">
-          AI-powered perfume recommendations tailored to your unique skin chemistry, 
-          preferences, and daily context.
+        <p className="text-lg text-gray-600">
+          Ready to discover your next favorite fragrance?
         </p>
-        
-        {user ? (
-          // Authenticated user - show app actions
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
-            <Button 
-              size="lg" 
-              onClick={() => onPageChange('profile')}
-              className="bg-purple-600 hover:bg-purple-700"
-            >
-              <Sparkles className="mr-2 h-5 w-5" />
-              Get Started
-            </Button>
-            <Button 
-              size="lg" 
-              variant="outline"
-              onClick={() => onPageChange('recommendations')}
-            >
-              Try AI Recommendation
-            </Button>
-          </div>
-        ) : (
-          // Non-authenticated user - show auth buttons
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
-            <Button 
-              size="lg" 
-              onClick={() => onPageChange('login')}
-              className="bg-purple-600 hover:bg-purple-700"
-            >
-              <LogIn className="mr-2 h-5 w-5" />
-              Sign In
-            </Button>
-            <Button 
-              size="lg" 
-              variant="outline"
-              onClick={() => onPageChange('register')}
-            >
-              <UserPlus className="mr-2 h-5 w-5" />
-              Create Account
-            </Button>
-          </div>
-        )}
       </div>
 
       {/* Quick Actions - Only show for authenticated users */}
       {user && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {quickActions.map((action, index) => {
-            const Icon = action.icon
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+          {quickActions.map((action, idx) => {
             return (
-              <Card 
-                key={index} 
-                className="cursor-pointer hover:shadow-lg transition-shadow duration-200"
+              <div
+                key={idx}
+                className={`rounded-xl shadow hover:shadow-lg transition p-6 flex flex-col items-center text-center cursor-pointer ${action.color}`}
                 onClick={action.action}
               >
-                <CardHeader className="pb-3">
-                  <div className="flex items-center space-x-3">
-                    <div className={`p-2 rounded-lg ${action.color} text-white`}>
-                      <Icon className="h-6 w-6" />
-                    </div>
-                    <CardTitle className="text-lg">{action.title}</CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600">{action.description}</p>
-                </CardContent>
-              </Card>
+                <div className="mb-3">{action.icon}</div>
+                <h3 className="text-xl font-semibold mb-1">{action.title}</h3>
+                <p className="text-gray-600">{action.description}</p>
+              </div>
             )
           })}
         </div>
       )}
+
+      {/* Personalized Section */}
+      <div className="bg-white rounded-xl shadow p-8 text-center">
+        <h2 className="text-2xl font-bold text-purple-700 mb-4">
+          Your Personalized Scent Journey
+        </h2>
+        <p className="text-gray-700 mb-6">
+          Explore recommendations, update your profile, and track your favorites. ScentAI learns and adapts to your preferences every day!
+        </p>
+        <Button
+          size="lg"
+          onClick={() => navigate('recommendations')}
+          className="bg-gradient-to-r from-purple-600 to-pink-500 text-white"
+        >
+          <Sparkles className="mr-2 h-5 w-5" />
+          Get Today's Recommendation
+        </Button>
+      </div>
 
       {/* Features Section */}
       <div className="bg-white rounded-lg shadow-sm p-8">
@@ -188,7 +156,7 @@ const HomePage = ({ onPageChange, user }) => {
         {user ? (
           <Button 
             size="lg"
-            onClick={() => onPageChange('profile')}
+            onClick={() => navigate('./profile')}
             className="bg-purple-600 hover:bg-purple-700"
           >
             <Heart className="mr-2 h-5 w-5" />
@@ -198,7 +166,7 @@ const HomePage = ({ onPageChange, user }) => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
               size="lg"
-              onClick={() => onPageChange('register')}
+              onClick={() => navigate("/register")}
               className="bg-purple-600 hover:bg-purple-700"
             >
               <UserPlus className="mr-2 h-5 w-5" />
@@ -207,7 +175,7 @@ const HomePage = ({ onPageChange, user }) => {
             <Button 
               size="lg"
               variant="outline"
-              onClick={() => onPageChange('login')}
+              onClick={() => navigate("/login")}
             >
               <LogIn className="mr-2 h-5 w-5" />
               Sign In

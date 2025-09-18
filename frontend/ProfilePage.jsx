@@ -1,8 +1,18 @@
 import React, { useEffect, useState } from "react";
 import QuestionnairePage from "./QuestionnairePage";
-import Chatbox from "./Chatbox"; // UI-only chatbox component
+import Chatbox from "./Chatbox";
+
+const getCurrentUserId = () => {
+  try {
+    const u = JSON.parse(localStorage.getItem("user"));
+    return u?.id || 1;
+  } catch {
+    return 1;
+  }
+};
 
 const ProfilePage = ({ userId }) => {
+  const resolvedUserId = userId || getCurrentUserId();
   const [profile, setProfile] = useState(null);
   const [recommendation, setRecommendation] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -10,31 +20,31 @@ const ProfilePage = ({ userId }) => {
 
   const BASE_API_URL = "http://localhost:8000";
 
-  // Fetch user profile and recommendation
   useEffect(() => {
-    fetch(`${BASE_API_URL}/user-profiles/${userId}`)
+    if (!resolvedUserId) return;
+
+    // Try to fetch the user's profile
+    fetch(`${BASE_API_URL}/profiles/${resolvedUserId}`)
       .then((res) => (res.status === 404 ? null : res.json()))
       .then((data) => {
         setProfile(data);
         setLoading(false);
-        if (data && data.recommendation_id) {
+        if (data?.recommendation_id) {
           fetch(`${BASE_API_URL}/recommendations/${data.recommendation_id}`)
             .then((res) => res.json())
             .then((rec) => setRecommendation(rec));
         }
       })
       .catch(() => setLoading(false));
-  }, [userId]);
+  }, [resolvedUserId]);
 
-  // Handler for when profile is created/updated via questionnaire
+  // Called after questionnaire is submitted and profile is created
   const handleProfileCreated = (newProfile) => {
     setProfile(newProfile);
     setEditing(false);
-    // Fetch recommendation if available
-    if (newProfile && newProfile.recommendation_id) {
-      fetch(
-        `http://localhost:8000/api/recommendations/${newProfile.recommendation_id}`
-      )
+
+    if (newProfile?.recommendation_id) {
+      fetch(`${BASE_API_URL}/recommendations/${newProfile.recommendation_id}`)
         .then((res) => res.json())
         .then((rec) => setRecommendation(rec));
     }
@@ -42,12 +52,16 @@ const ProfilePage = ({ userId }) => {
 
   if (loading) return <div>Loading...</div>;
 
-  // Show questionnaire if no profile or editing
-  if (!profile || editing) {
+  // If no profile exists or editing, show questionnaire
+  if (
+    editing ||
+    !profile ||
+    profile?.message?.toLowerCase().includes("cannot find user profile")
+  ) {
     return (
       <div>
         <QuestionnairePage
-          userId={userId}
+          userId={resolvedUserId}
           onProfileCreated={handleProfileCreated}
         />
         <div style={{ marginTop: "2em" }}>
@@ -57,7 +71,7 @@ const ProfilePage = ({ userId }) => {
     );
   }
 
-  // Show profile, recommendation, and update option
+  // Only show profile and recommendation if profile exists
   return (
     <div>
       <h2>Your Profile</h2>
@@ -75,15 +89,8 @@ const ProfilePage = ({ userId }) => {
       </button>
       <h3>Your Recommendation</h3>
       {recommendation ? (
-        <div
-          style={{
-            border: "1px solid #ccc",
-            padding: "1em",
-            marginBottom: "2em",
-          }}
-        >
-          <b>Perfume:</b> {recommendation.perfume_name || recommendation.name}{" "}
-          <br />
+        <div style={{ border: "1px solid #ccc", padding: "1em", marginBottom: "2em" }}>
+          <b>Perfume:</b> {recommendation.perfume_name || recommendation.name} <br />
           <b>Brand:</b> {recommendation.brand} <br />
           <b>Notes:</b> {recommendation.notes || "-"}
         </div>
