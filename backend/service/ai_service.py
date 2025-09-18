@@ -28,21 +28,21 @@ class AIService:
 
         try:
             user_profile = {
-                "skin_type": "Dry",
+                "skin_type": "Balanced",
                 "skin_temperature": "Neutral",
                 "skin_hydration": "Medium",
                 "primary_climate": "Hot & Humid",
                 "avg_temperature": "26-32",
                 "typical_environment": "Outdoor",
-                "preferred_families": ["Fruity", "Aromatic"],
-                "disliked_families": ["Amber", "Spicy"],
+                "preferred_families": ["Spicy"],
+                "disliked_families": [],
                 "preferred_intensity": "Strong",
                 "longevity_target": "5",
                 "gender_presentation": "Masculine",
                 "preferred_character": "Fresh/Clean",
                 "spray_location": "Skin & clothes",
                 "budget_min": 30,
-                "budget_max": 55,
+                "budget_max": 150,
             }
             prompt = f"""
                         Recommend perfume based on user unique profile.
