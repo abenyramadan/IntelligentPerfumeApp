@@ -89,15 +89,22 @@ const ProfilePage = ({ userId }) => {
       </button>
       <h3>Your Recommendation</h3>
       {recommendation ? (
-        <div style={{ border: "1px solid #ccc", padding: "1em", marginBottom: "2em" }}>
-          <b>Perfume:</b> {recommendation.perfume_name || recommendation.name} <br />
+        <div
+          style={{
+            border: "1px solid #ccc",
+            padding: "1em",
+            marginBottom: "2em",
+          }}
+        >
+          <b>Perfume:</b> {recommendation.perfume_name || recommendation.name}{" "}
+          <br />
           <b>Brand:</b> {recommendation.brand} <br />
           <b>Notes:</b> {recommendation.notes || "-"}
         </div>
       ) : (
         <div>No recommendation yet.</div>
       )}
-      <Chatbox />
+      {/* <Chatbox /> */}
     </div>
   );
 };

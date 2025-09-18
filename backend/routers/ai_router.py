@@ -1,9 +1,10 @@
 from service.ai_service import AIService
+from schema.ai_rec_payload_schema import AIRecPayloadSchema
 from fastapi import APIRouter
 
 router = APIRouter(prefix="/ai", tags=["AI API"])
 
 
-@router.get("/")
-def get_recommendation(user_id: int):
-    return AIService.get_recommendation(user_id)
+@router.post("/")
+def get_recommendation(payload: AIRecPayloadSchema):
+    return AIService.get_recommendation(payload)
