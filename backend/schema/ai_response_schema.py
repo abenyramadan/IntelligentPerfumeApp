@@ -12,3 +12,9 @@ class AIResponseSchema(BaseModel):
     predicted_pleasantness: float | None = None  # 1-10
     utility_score: float | None = None
     image_url: str | None = None  # perfume image url
+
+    # context in which recommendation was made
+    context_mood: str | None = None
+    context_activity: str | None = None
+    context_temperature: float | None = None
+    context_humidity: float | None = None

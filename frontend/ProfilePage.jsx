@@ -5,9 +5,9 @@ import Chatbox from "./Chatbox";
 const getCurrentUserId = () => {
   try {
     const u = JSON.parse(localStorage.getItem("user"));
-    return u?.id || 1;
+    return u?.user_id || null;
   } catch {
-    return 1;
+    return null;
   }
 };
 

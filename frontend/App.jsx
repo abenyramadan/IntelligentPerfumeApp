@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import Layout from "./Layout";
 import LandingPage from "./LandingPage";
 import HomePage from "./HomePage";
@@ -11,7 +16,6 @@ import LoginPage from "./LoginPage";
 import RegisterPage from "./RegisterPage";
 import Dashboard from "./dashboard/dashboard";
 import { Toaster } from "sonner";
-
 
 function App() {
   const [user, setUser] = useState(null);
@@ -47,7 +51,8 @@ function App() {
   const handleLogout = () => {
     setUser(null);
     setIsAuthenticated(false);
-    localStorage.removeItem("user");
+
+    localStorage.clear();
   };
 
   // Admin-only route wrapper
@@ -64,7 +69,10 @@ function App() {
       <Routes>
         {/* Public routes */}
         <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
-        <Route path="/register" element={<RegisterPage onRegister={handleRegister} />} />
+        <Route
+          path="/register"
+          element={<RegisterPage onRegister={handleRegister} />}
+        />
         {/* Protected routes */}
         <Route
           path="/"
