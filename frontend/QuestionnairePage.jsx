@@ -363,10 +363,10 @@ const QuestionnairePage = ({ userId: propUserId }) => {
       <div className="max-w-3xl mx-auto space-y-8">
         <Card>
           <CardHeader>
-            <CardTitle>Your Profile is here</CardTitle>
+            <CardTitle>Your Profile</CardTitle>
           </CardHeader>
           <CardContent>
-            <ul>
+            <ul className="mb-6">
               {Object.entries(answers).map(([k, v]) => (
                 <li key={k}>
                   <b>{k.replace(/_/g, " ")}:</b>{" "}
@@ -374,18 +374,17 @@ const QuestionnairePage = ({ userId: propUserId }) => {
                 </li>
               ))}
             </ul>
-            <div className="flex gap-4 mt-6">
+            <div className="flex gap-4">
               <Button onClick={handleGetRecommendation}>
-                Get Recommendation
+                Get Recommendations
               </Button>
               <Button variant="outline" onClick={() => setShowProfile(false)}>
-                Update Your Profile
+                Update Profile
               </Button>
             </div>
             {recommendation && (
               <div className="mt-6 p-4 border rounded">
                 <h3 className="font-bold mb-2">Your Recommendation</h3>
-                {/* Display recommendation details */}
                 {Array.isArray(recommendation.recommendations) ? (
                   recommendation.recommendations.map((rec, idx) => (
                     <div key={idx} className="mb-4">

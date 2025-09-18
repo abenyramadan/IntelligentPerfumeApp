@@ -21,7 +21,7 @@ const HistoryPage = ({ userId: propUserId, onPageChange }) => {
     setLoading(true)
     try {
       const response = await fetch(
-        `http://localhost:5000/api/users/${userId}/recommendations/history?page=1&per_page=10`
+        `http://localhost:8000/api/users/${userId}/recommendations/history?page=1&per_page=10`
       )
       
       if (response.ok) {

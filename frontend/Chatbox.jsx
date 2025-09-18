@@ -1,3 +1,5 @@
+
+/* Chatbox.jsx
 import React, { useState } from 'react'
 
 const initialMessages = [
@@ -88,3 +90,4 @@ export default function Chatbot({ onComplete }) {
     </div>
   )
 }
+  */

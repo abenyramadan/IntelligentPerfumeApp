@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import QuestionnairePage from "./QuestionnairePage";
-import Chatbox from "./Chatbox";
 
 const getCurrentUserId = () => {
   try {
@@ -64,7 +63,9 @@ const ProfilePage = ({ userId }) => {
           userId={resolvedUserId}
           onProfileCreated={handleProfileCreated}
         />
-        <div style={{ marginTop: "2em" }}>{/* <Chatbox /> */}</div>
+        <div style={{ marginTop: "2em" }}>
+          <Chatbox />
+        </div>
       </div>
     );
   }
