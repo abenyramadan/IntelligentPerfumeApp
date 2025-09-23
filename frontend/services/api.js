@@ -1,5 +1,5 @@
 // src/services/api.js
-const API_BASE_URL = "http://127.0.0.1:8000";
+const API_BASE_URL = "http://192.168.133.165:8000";
 const ApiService = {
   async createUser(userData) {
     const res = await fetch(`${API_BASE_URL}/users`, {
@@ -22,8 +22,11 @@ const ApiService = {
   },
 
   // get profile
-  async getUserProfile(userId) {
-    const res = await fetch(`${API_BASE_URL}/profiles/${userId}`);
+  async getUserById(userId) {
+    const res = await fetch(`${API_BASE_URL}/users/${userId}`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    });
     if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
     return res.json();
   },

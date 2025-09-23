@@ -55,7 +55,7 @@ class UserService:
                     message=f"Cannot find user with id: {user_id}",
                 )
             else:
-                db_user.username = user.name
+                db_user.username = user.username
                 db_user.email = user.email
                 db_user.password = HashService.hash_password(user.password)
 
@@ -112,7 +112,7 @@ class UserService:
                 return APIResponse(success=True, message="Found user", data=[db_user])
 
     @classmethod
-    def get_users_all(cls) -> APIResponse:
+    def get_all_users(cls) -> APIResponse:
         with get_session() as session:
             db_users = session.query(User).all()
             if not db_users:

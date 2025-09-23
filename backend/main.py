@@ -53,6 +53,7 @@ app = FastAPI(
         "url": "htttps://x.com/awetthon",
     },
     lifespan=lifespan,
+    redirect_slashes=False,  # ✅ Disable automatic slash redirects
 )
 
 

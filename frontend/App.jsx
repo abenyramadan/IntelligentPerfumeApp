@@ -18,7 +18,10 @@ import Dashboard from "./dashboard/dashboard";
 import { Toaster } from "sonner";
 
 function App() {
-  const [user, setUser] = useState(null);
+  // derive user from localStorage instead of AuthContext
+  const saved = localStorage.getItem("user");
+  const user = saved ? JSON.parse(saved) : null;
+
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   // Check for existing user session on app load
@@ -27,7 +30,6 @@ function App() {
     if (savedUser) {
       try {
         const userData = JSON.parse(savedUser);
-        setUser(userData);
         setIsAuthenticated(true);
       } catch (error) {
         console.error("Error parsing saved user:", error);
@@ -37,22 +39,20 @@ function App() {
   }, []);
 
   const handleLogin = (userData) => {
-    setUser(userData);
     setIsAuthenticated(true);
     localStorage.setItem("user", JSON.stringify(userData));
   };
 
   const handleRegister = (userData) => {
-    setUser(userData);
     setIsAuthenticated(true);
     localStorage.setItem("user", JSON.stringify(userData));
   };
 
   const handleLogout = () => {
-    setUser(null);
     setIsAuthenticated(false);
-
-    localStorage.clear();
+    localStorage.clear(); // Clear ALL localStorage data
+    // Force a page reload to clear all component state
+    window.location.href = '/';
   };
 
   // Admin-only route wrapper
@@ -101,48 +101,40 @@ function App() {
         <Route
           path="/profile"
           element={
-            isAuthenticated ? (
+            isAuthenticated && (
               <Layout onLogout={handleLogout} user={user}>
-                <ProfilePage user={user} />
+                <ProfilePage userId={user.id} />
               </Layout>
-            ) : (
-              <Navigate to="/" replace />
             )
           }
         />
         <Route
           path="/recommendations"
           element={
-            isAuthenticated ? (
+            isAuthenticated && (
               <Layout onLogout={handleLogout} user={user}>
                 <RecommendationsPage user={user} />
               </Layout>
-            ) : (
-              <Navigate to="/" replace />
             )
           }
         />
         <Route
           path="/history"
           element={
-            isAuthenticated ? (
+            isAuthenticated && (
               <Layout onLogout={handleLogout} user={user}>
                 <HistoryPage user={user} />
               </Layout>
-            ) : (
-              <Navigate to="/login" replace />
             )
           }
         />
         <Route
           path="/questionnaire"
           element={
-            isAuthenticated ? (
+            isAuthenticated && (
               <Layout onLogout={handleLogout} user={user}>
-                <QuestionnairePage user={user} />
+                <QuestionnairePage userId={user.id} />
               </Layout>
-            ) : (
-              <Navigate to="/login" replace />
             )
           }
         />
@@ -150,10 +142,8 @@ function App() {
         <Route
           path="/dashboard"
           element={
-            isAuthenticated ? (
+            isAuthenticated && (
               <Dashboard />
-            ) : (
-              <Navigate to="/dashboard" replace />
             )
           }
         />

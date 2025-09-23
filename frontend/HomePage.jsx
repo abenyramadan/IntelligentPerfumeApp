@@ -81,7 +81,7 @@ const HomePage = ({ onPageChange, user }) => {
       {/* Welcome Section */}
       <div className="text-center mb-10">
         <h1 className="text-4xl font-bold text-purple-700 mb-2">
-          Welcome back, {capitalize(user?.username) || "Scent Lover"}!
+          Welcome to ScentAI, {capitalize(user?.username) || "Scent Lover"}!
         </h1>
         <p className="text-lg text-gray-600">
           Ready to discover your next favorite fragrance?

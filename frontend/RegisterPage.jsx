@@ -49,9 +49,9 @@ function RegisterPage({ onRegister }) {
         username: formData.username,
         email: formData.email,
         password: formData.password,
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        phone: formData.phone,
+        first_name: formData.firstName,  // ✅ Match backend field name
+        last_name: formData.lastName,    // ✅ Match backend field name
+        phone: formData.phone,           // ✅ Remove this - backend doesn't expect phone
       });
 
       if (response?.success) {
@@ -63,10 +63,12 @@ function RegisterPage({ onRegister }) {
 
         if (loginRes?.success) {
           const userObj = {
-            user_id: loginRes.data[0]?.user_id,
+            id: loginRes.data[0]?.user_id,     // ✅ Use id instead of user_id for consistency
+            user_id: loginRes.data[0]?.user_id, // ✅ Keep both for compatibility
             token: loginRes.data[0]?.token,
             token_type: loginRes.data[0]?.type,
             username: formData.username,
+            email: formData.email,               // ✅ Include email in user object
           };
 
           localStorage.setItem("user", JSON.stringify(userObj));

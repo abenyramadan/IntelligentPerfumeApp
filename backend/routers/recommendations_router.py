@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Query
 
 from service.recommendation_service import RecommendationService
 from schema.recommendation_schema import RecommendationSchema
@@ -10,6 +10,21 @@ router = APIRouter(prefix="/recommendations", tags=["Recommendations"])
 @router.get("/")
 def get_recommendations_all():
     return RecommendationService.get_recommendation_all()
+
+
+@router.get("/my")
+def get_user_recommendations(
+    user_id: int = Query(..., description="User ID"),
+    limit: int = Query(5, description="Number of recommendations to return")
+):
+    return RecommendationService.get_user_recommendations(user_id, limit)
+
+
+@router.get("/my/latest")
+def get_latest_ai_recommendation(
+    user_id: int = Query(..., description="User ID")
+):
+    return RecommendationService.get_latest_ai_recommendation(user_id)
 
 
 @router.get("/{rec_id}")

@@ -12,18 +12,21 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { Heart } from "lucide-react";
 import { toast } from "sonner";
-import { API_BASE_URL } from "./constants/constants";
+import RecommendationGallery from "./RecommendationGallery";
 
 const getCurrentUserId = () => {
   try {
-    return JSON.parse(localStorage.getItem("user"))?.user_id;
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    // Try different possible user ID fields (id first, then user_id)
+    return user?.id || user?.user_id || null;
   } catch {
-    return undefined;
+    return null; // Return null instead of 1 to avoid showing wrong user's data
   }
 };
 
 const RecommendationsPage = ({ userId: propUserId }) => {
   const userId = propUserId || getCurrentUserId();
+
   const [context, setContext] = useState({
     mood: "",
     activity: "",
@@ -72,10 +75,11 @@ const RecommendationsPage = ({ userId: propUserId }) => {
     context.mood &&
     context.activity &&
     context.primary_climate &&
-    userId !== undefined && userId !== null;
+    userId !== undefined && userId !== null && userId !== "";
 
   const getAIRecommendations = async () => {
     setLoading(true);
+
     try {
       if (isReady) {
         const payload = {
@@ -87,26 +91,44 @@ const RecommendationsPage = ({ userId: propUserId }) => {
           humidity: context.humidity,
         };
 
-        const url = API_BASE_URL + "/ai/";
-        const response = await fetch(url, {
+        const response = await fetch("http://127.0.0.1:8000/ai/", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
+
         if (response.ok) {
           const data = await response.json();
-          setRecommendations(data.data || []);
-          toast.success("Personalized recommendations loaded!");
+
+          // Handle different response structures
+          const recommendationsData = data.data || data;
+          if (Array.isArray(recommendationsData)) {
+            setRecommendations(recommendationsData);
+          } else if (recommendationsData && typeof recommendationsData === 'object') {
+            setRecommendations([recommendationsData]);
+          } else {
+            setRecommendations([]);
+            toast.error("No recommendations available at the moment.");
+          }
+
+          toast.success("Perfect match found!");
         } else {
           const error = await response.json();
-          toast.error(error.error || "Failed to get recommendations");
+
+          // Provide user-friendly error messages
+          if (response.status === 400) {
+            toast.error("Please complete your profile first to receive personalized recommendations.");
+          } else if (response.status === 500) {
+            toast.error("Our recommendation service is temporarily unavailable. Please try again in a few moments.");
+          } else {
+            toast.error("Unable to get recommendations right now. Please try again.");
+          }
         }
       } else {
-        toast.error("Please select all fields before getting recommendations.");
+        toast.error("Please select your mood, activity, and climate conditions.");
       }
     } catch (error) {
-      console.error("Error getting recommendations:", error);
-      toast.error("Error getting recommendations");
+      toast.error("Connection issue. Please check your internet connection and try again.");
     } finally {
       setLoading(false);
     }
@@ -116,42 +138,51 @@ const RecommendationsPage = ({ userId: propUserId }) => {
     <div className="max-w-2xl mx-auto py-8">
       <Card>
         <CardHeader>
-          <CardTitle>Get AI Recommendations</CardTitle>
+          <CardTitle>AI Fragrance Recommendations</CardTitle>
+          <p className="text-sm text-gray-600">
+            Get personalized fragrance suggestions based on your current mood and environment.
+          </p>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Context Dropdowns */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Context Selection */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <Label>Mood</Label>
+              <Label htmlFor="mood">Current Mood</Label>
               <select
+                id="mood"
                 value={context.mood}
                 onChange={e => updateContext("mood", e.target.value)}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
               >
-                <option value="">Select Mood</option>
+                <option value="">Select mood</option>
                 {moods.map(m => (
                   <option key={m} value={m}>{m}</option>
                 ))}
               </select>
             </div>
             <div>
-              <Label>Activity</Label>
+              <Label htmlFor="activity">Activity</Label>
               <select
+                id="activity"
                 value={context.activity}
                 onChange={e => updateContext("activity", e.target.value)}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
               >
-                <option value="">Select Activity</option>
+                <option value="">Select activity</option>
                 {activities.map(a => (
                   <option key={a} value={a}>{a}</option>
                 ))}
               </select>
             </div>
             <div>
-              <Label>Primary Climate</Label>
+              <Label htmlFor="climate">Environment</Label>
               <select
+                id="climate"
                 value={context.primary_climate}
                 onChange={e => updateContext("primary_climate", e.target.value)}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
               >
-                <option value="">Select Climate</option>
+                <option value="">Select environment</option>
                 {climates.map(c => (
                   <option key={c} value={c}>{c}</option>
                 ))}
@@ -159,6 +190,7 @@ const RecommendationsPage = ({ userId: propUserId }) => {
             </div>
           </div>
 
+          {/* Environmental Factors */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <Label>Temperature: {context.temperature}°C</Label>
@@ -188,9 +220,9 @@ const RecommendationsPage = ({ userId: propUserId }) => {
             <Button
               onClick={getAIRecommendations}
               disabled={!isReady || loading}
+              className="px-8"
             >
-              <Heart className="mr-2 h-4 w-4" />
-              {loading ? "Finding Matches..." : "Get Recommendation"}
+              {loading ? "Analyzing..." : "Get Recommendation"}
             </Button>
           </div>
         </CardContent>
@@ -199,20 +231,22 @@ const RecommendationsPage = ({ userId: propUserId }) => {
       {/* Display Recommendations */}
       {recommendations.length > 0 && (
         <div className="mt-8 space-y-4">
-          <h2 className="text-xl font-bold text-gray-900">Recommendations</h2>
+          <h2 className="text-xl font-bold text-gray-900">Your Recommendations</h2>
           {recommendations.map((rec, idx) => (
-            <Card key={idx}>
-              <CardHeader>
-                <CardTitle>{rec.perfume || "Perfume Recommendation"}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {rec.reason && (
-                  <p className="text-gray-700">{rec.reason}</p>
-                )}
-                {/* Add more perfume details here as needed */}
-              </CardContent>
-            </Card>
+            <RecommendationGallery
+              key={`rec-${idx}`}
+              recommendation={rec}
+            />
           ))}
+        </div>
+      )}
+
+      {/* No Recommendations Message */}
+      {recommendations.length === 0 && !loading && (
+        <div className="mt-8 text-center">
+          <p className="text-gray-500">
+            Select your preferences above and click "Get Recommendation" to see personalized fragrance suggestions.
+          </p>
         </div>
       )}
     </div>

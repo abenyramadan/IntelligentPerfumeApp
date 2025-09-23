@@ -15,20 +15,23 @@ import { Badge } from "@/components/ui/badge";
 import { useQuestionnaire } from "./services/useApi";
 import ApiService from "./services/api.js";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 import { convertToArray, groupDataByKey } from "./utils/utils.js";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
 const getCurrentUserId = () => {
   try {
-    const u = JSON.parse(localStorage.getItem("user"));
-    return u?.id || 1;
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    // Try different possible user ID fields (id first, then user_id)
+    return user?.id || user?.user_id || null;
   } catch {
-    return 1;
+    return null; // Return null instead of 1 to avoid showing wrong user's data
   }
 };
 
-const QuestionnairePage = ({ userId: propUserId }) => {
+const QuestionnairePage = ({ userId: propUserId, onProfileCreated }) => {
+  const navigate = useNavigate();
   const resolvedUserId = propUserId || getCurrentUserId();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -92,6 +95,10 @@ const QuestionnairePage = ({ userId: propUserId }) => {
   }, []);
 
   const handleChange = (id, value) => {
+    console.log('=== DEBUG: Form input changed ===');
+    console.log('Question ID:', id);
+    console.log('New value:', value);
+    console.log('Value type:', typeof value);
     setAnswers((prev) => ({ ...prev, [id]: value }));
   };
 
@@ -103,12 +110,21 @@ const QuestionnairePage = ({ userId: propUserId }) => {
         ? current.filter((o) => o !== option)
         : [...current, option];
       if (max && next.length > max) return prev;
+
+      console.log('=== DEBUG: Multi-select changed ===');
+      console.log('Question ID:', id);
+      console.log('Option:', option);
+      console.log('Previous selection:', current);
+      console.log('New selection:', next);
+
       return { ...prev, [id]: next };
     });
   };
 
   const handleNext = () => {
     if (topicId < questions.length - 1) {
+      console.log('=== DEBUG: Moving to next topic ===');
+      console.log('Current answers at topic', topicId, ':', answers);
       setTopicId((prev_val) => prev_val + 1);
     }
   };
@@ -123,6 +139,25 @@ const QuestionnairePage = ({ userId: propUserId }) => {
     setSubmitting(true);
     try {
       const userId = Number(getCurrentUserId());
+
+      console.log('=== DEBUG: Submitting questionnaire ===');
+      console.log('User ID:', userId);
+      console.log('Resolved User ID:', resolvedUserId);
+      console.log('Answers object:', answers);
+      console.log('Number of answers:', Object.keys(answers).length);
+      console.log('Questions loaded:', questions?.length || 0);
+
+      // Validate that we have questions loaded
+      if (!questions || questions.length === 0) {
+        toast.error("Questions not loaded properly. Please refresh and try again.");
+        setSubmitting(false);
+        return;
+      }
+
+      // Ensure user ID is consistent
+      if (userId !== resolvedUserId) {
+        console.warn(`User ID mismatch: ${userId} vs ${resolvedUserId}, using ${resolvedUserId}`);
+      }
 
       // Save each questionnaire response
       for (const [question_id, value] of Object.entries(answers)) {
@@ -139,12 +174,14 @@ const QuestionnairePage = ({ userId: propUserId }) => {
         }
 
         const responseObj = {
-          user_id: userId,
+          user_id: resolvedUserId, // Use resolved user ID for consistency
           question_id: String(question_id),
           answer_text,
           answer_number,
           answer_json,
         };
+
+        console.log('Saving response for question', question_id, ':', responseObj);
 
         const response = await fetch('http://127.0.0.1:8000/questionnaires/responses/', {
           method: 'POST',
@@ -159,22 +196,72 @@ const QuestionnairePage = ({ userId: propUserId }) => {
         }
       }
 
-      // Create user profile by user_id only
-      const profileRes = await fetch('http://127.0.0.1:8000/profiles/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: userId }),
+      // Create payload for AI profile creation
+      const profilePayload = {
+        user_id: resolvedUserId,
+        questions: questions.flatMap(topic =>
+          topic.questions ? topic.questions.map(q => ({
+            question_id: q.question_id,
+            question_text: q.question_text,
+            question_topic: q.question_topic
+          })) : []
+        ),
+        answers: Object.entries(answers).map(([questionId, answerValue]) => {
+          const question = questions.flatMap(topic =>
+            topic.questions || []
+          ).find(q => q.id === questionId || q.question_id === questionId);
+
+          let processedAnswer = answerValue;
+          if (Array.isArray(answerValue)) {
+            processedAnswer = answerValue.join(", ");
+          }
+
+          return {
+            question_id: questionId,
+            answer: processedAnswer,
+            question_text: question?.question_text || `Question ${questionId}`
+          };
+        })
+      };
+
+      console.log('Profile creation payload:', profilePayload);
+
+      const profileRes = await fetch("http://127.0.0.1:8000/profiles/create/profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(profilePayload),
       });
 
+      console.log('Profile creation response status:', profileRes.status);
+
       if (profileRes.ok) {
-        setProfileCreated(true);
-        setShowProfile(true);
-        toast.success("Profile created!");
+        const createdProfile = await profileRes.json();
+        console.log('Profile created successfully:', createdProfile);
+
+        const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+        const updatedUser = {
+          ...storedUser,
+          profile: createdProfile,
+          profile_id: createdProfile.id
+        };
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+
+        // Call the callback with the created profile data
+        if (onProfileCreated) {
+          onProfileCreated(createdProfile);
+        }
+
+        toast.success("Profile created! Redirecting…");
+        // Navigate back to profile page instead of /myprofile
+        navigate("/profile");
       } else {
-        toast.error("Failed to create user profile");
+        const err = await profileRes.json().catch(() => null);
+        console.error('Profile creation failed:', err);
+        toast.error(err?.detail?.[0]?.msg || "Failed to create user profile");
       }
     } catch (error) {
-      toast.error('An error occurred');
+      console.error('Submit error:', error);
+      toast.error("An error occurred");
     } finally {
       setSubmitting(false);
     }
@@ -182,7 +269,7 @@ const QuestionnairePage = ({ userId: propUserId }) => {
 
   const handleGetRecommendation = async () => {
     const userId = Number(getCurrentUserId());
-    const recResponse = await fetch('http://127.0.0.1:8000/recommendations/ai', {
+    const recResponse = await fetch('http://127.0.0.1:8000/ai/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ user_id: userId }),
@@ -255,10 +342,14 @@ const QuestionnairePage = ({ userId: propUserId }) => {
                     {q.multiple_choices &&
                       convertToArray(q.multiple_choices).map((opt) => (
                         <div key={`single-${q.id}-${opt}`} className="flex items-center space-x-2">
-                          <Checkbox
+                          <input
+                            type="radio"
                             id={`${q.id}-${opt}`}
+                            name={q.id}
+                            value={opt}
                             checked={answers[q.id] === opt}
-                            onCheckedChange={() => handleChange(q.id, opt)}
+                            onChange={(e) => handleChange(q.id, opt)}
+                            className="mr-2"
                           />
                           <Label htmlFor={`${q.id}-${opt}`} className="text-sm cursor-pointer">
                             {opt}
@@ -302,51 +393,7 @@ const QuestionnairePage = ({ userId: propUserId }) => {
     );
   }
 
-  // Show profile and actions after submit
-  if (showProfile) {
-    return (
-      <div className="max-w-3xl mx-auto space-y-8">
-        <Card>
-          <CardHeader>
-            <CardTitle>Your Profile is here</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul>
-              {Object.entries(answers).map(([k, v]) => (
-                <li key={k}>
-                  <b>{k.replace(/_/g, " ")}:</b> {Array.isArray(v) ? v.join(", ") : v}
-                </li>
-              ))}
-            </ul>
-            <div className="flex gap-4 mt-6">
-              <Button onClick={handleGetRecommendation}>
-                Get Recommendation
-              </Button>
-              <Button variant="outline" onClick={() => setShowProfile(false)}>
-                Update Your Profile
-              </Button>
-            </div>
-            {recommendation && (
-              <div className="mt-6 p-4 border rounded">
-                <h3 className="font-bold mb-2">Your Recommendation</h3>
-                {/* Display recommendation details */}
-                {Array.isArray(recommendation.recommendations)
-                  ? recommendation.recommendations.map((rec, idx) => (
-                      <div key={idx} className="mb-4">
-                        <b>Perfume:</b> {rec.perfume_name || rec.name} <br />
-                        <b>Brand:</b> {rec.brand} <br />
-                        <b>Notes:</b> {rec.notes || "-"}
-                      </div>
-                    ))
-                  : <div>{JSON.stringify(recommendation)}</div>
-                }
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+ 
 
   return (
     <div className="max-w-3xl mx-auto space-y-8">
@@ -366,7 +413,7 @@ const QuestionnairePage = ({ userId: propUserId }) => {
                         {q.question_id ? `${q.question_id}. ` : ""}{q.question_text || "Question"}
                       </Label>
 
-                      {/* Multiple choice selection */}
+                      {/* Multiple choice selection (checkboxes) */}
                       {q.type === "select" && q.can_select_multiple && (
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
                           {q.multiple_choices && convertToArray(q.multiple_choices).map((opt) => (
@@ -384,15 +431,19 @@ const QuestionnairePage = ({ userId: propUserId }) => {
                         </div>
                       )}
 
-                      {/* Single choice selection */}
+                      {/* Single choice selection (radio buttons) */}
                       {q.type === "select" && !q.can_select_multiple && (
                         <div className="space-y-2 mt-2">
                           {q.multiple_choices && convertToArray(q.multiple_choices).map((opt) => (
                             <div key={`single-${q.id}-${opt}`} className="flex items-center space-x-2">
-                              <Checkbox
+                              <input
+                                type="radio"
                                 id={`${q.id}-${opt}`}
+                                name={q.id}
+                                value={opt}
                                 checked={answers[q.id] === opt}
-                                onCheckedChange={() => handleChange(q.id, opt)}
+                                onChange={(e) => handleChange(q.id, e.target.value)}
+                                className="mr-2"
                               />
                               <Label htmlFor={`${q.id}-${opt}`} className="text-sm cursor-pointer">
                                 {opt}

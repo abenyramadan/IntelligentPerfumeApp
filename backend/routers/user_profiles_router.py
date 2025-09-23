@@ -22,9 +22,9 @@ def get_user_profiles_all():
     return UserProfileService.get_user_profile_all()
 
 
-@router.get("/{profile_id}")
-def get_user_profile_by(profile_id: int):
-    return UserProfileService.get_user_profile_by_id(profile_id)
+@router.get("/user/{user_id}")
+def get_user_profile_by_user_id(user_id: int):
+    return UserProfileService.get_user_profile_user_id(user_id)
 
 
 # create profile

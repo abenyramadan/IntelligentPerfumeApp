@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fix User ID Issue</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .code { background: #f5f5f5; padding: 15px; border-radius: 5px; margin: 10px 0; }
+        button { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Fix User ID Issue</h1>
+        <p>This tool will fix the user ID mismatch issue in your perfume recommendation system.</p>
+        
+        <h2>📋 Steps to Fix:</h2>
+        <ol>
+            <li>Click the button below to automatically fix the user ID</li>
+            <li>The page will refresh automatically</li>
+            <li>Your recommendations should now work correctly</li>
+        </ol>
+        
+        <button onclick="fixUserId()">🔧 Fix User ID Automatically</button>
+        
+        <h2>🔍 Current Status:</h2>
+        <div id="status"></div>
+        
+        <h2>📝 Manual Instructions:</h2>
+        <p>If the automatic fix doesn't work, run these commands in your browser console:</p>
+        <div class="code">
+const user = JSON.parse(localStorage.getItem('user') || '{}');<br>
+user.user_id = 1;<br>
+user.id = 1;<br>
+localStorage.setItem('user', JSON.stringify(user));<br>
+location.reload();
+        </div>
+    </div>
+
+    <script>
+        function fixUserId() {
+            const statusDiv = document.getElementById('status');
+            
+            try {
+                // Check current user
+                const currentUser = localStorage.getItem('user');
+                if (!currentUser) {
+                    statusDiv.innerHTML = '<p style="color: red;">❌ No user found in localStorage</p>';
+                    return;
+                }
+                
+                const user = JSON.parse(currentUser);
+                statusDiv.innerHTML = `<p>📊 Current user ID: ${user.user_id || user.id}</p>`;
+                
+                // Update user ID
+                user.user_id = 1;
+                user.id = 1;
+                
+                localStorage.setItem('user', JSON.stringify(user));
+                statusDiv.innerHTML += '<p style="color: green;">✅ Updated user ID to 1</p>';
+                
+                // Refresh page
+                setTimeout(() => {
+                    statusDiv.innerHTML += '<p style="color: blue;">🔄 Refreshing page...</p>';
+                    location.reload();
+                }, 1000);
+                
+            } catch (error) {
+                statusDiv.innerHTML = `<p style="color: red;">❌ Error: ${error.message}</p>`;
+            }
+        }
+        
+        // Show current status on page load
+        window.onload = function() {
+            const statusDiv = document.getElementById('status');
+            const currentUser = localStorage.getItem('user');
+            if (currentUser) {
+                const user = JSON.parse(currentUser);
+                statusDiv.innerHTML = `<p>📊 Current user ID: ${user.user_id || user.id || 'Not set'}</p>`;
+            } else {
+                statusDiv.innerHTML = '<p>❌ No user found in localStorage</p>';
+            }
+        };
+    </script>
+</body>
+</html>

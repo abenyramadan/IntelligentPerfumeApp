@@ -33,11 +33,19 @@ function LoginPage({ onLogin }) {
 
       // check if login was successful
       if (response?.success) {
+        // The response contains a token object, need to get user info separately
+        const tokenData = response.data[0];
+
+        // Get user details using the token's user_id
+        const userResponse = await ApiService.getUserById(tokenData.user_id);
+
         const userObj = {
-          user_id: response.data[0]?.user_id,
-          token: response.data[0]?.token,
-          token_type: response.data[0]?.type,
-          username: formData.username,
+          id: tokenData.user_id,  // ✅ Use the correct field name
+          user_id: tokenData.user_id,  // ✅ Include both for compatibility
+          token: tokenData.token,
+          token_type: tokenData.type,
+          username: userResponse?.data?.[0]?.username || formData.username,
+          email: userResponse?.data?.[0]?.email || '',
         };
 
         localStorage.setItem("user", JSON.stringify(userObj));

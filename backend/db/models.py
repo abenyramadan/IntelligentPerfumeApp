@@ -7,6 +7,7 @@ from sqlalchemy import (
     Float,
     Text,
     Boolean,
+    JSON,  # Added JSON import for storing alternative recommendations
 )
 
 
@@ -267,7 +268,16 @@ class Recommendation(Base):
     __tablename__ = "recommendations"
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    perfume_id = Column(Integer, ForeignKey("perfumes.id"), nullable=False)
+
+    # Can be either perfume_id (for database perfumes) or AI-generated perfume name
+    perfume_id = Column(Integer, ForeignKey("perfumes.id"), nullable=True)  # Made nullable for AI recommendations
+    ai_perfume_name = Column(String(255), nullable=True)  # For AI-generated recommendations
+
+    # Recommendation content - for AI recommendations
+    reason = Column(Text, nullable=True)  # AI explanation
+    other_perfumes_to_try = Column(JSON, nullable=True)  # Alternative recommendations as JSON
+    image_url = Column(String(500), nullable=True)  # For AI-generated perfume images
+    price = Column(Float, nullable=True)  # Price for AI recommendations
 
     # Recommendation context
     recommendation_date = Column(DateTime, default=datetime.utcnow)
@@ -302,6 +312,11 @@ class Recommendation(Base):
             "id": self.id,
             "user_id": self.user_id,
             "perfume_id": self.perfume_id,
+            "ai_perfume_name": self.ai_perfume_name,
+            "reason": self.reason,
+            "other_perfumes_to_try": self.other_perfumes_to_try,
+            "image_url": self.image_url,
+            "price": self.price,
             "recommendation_date": (
                 self.recommendation_date.isoformat()
                 if self.recommendation_date
