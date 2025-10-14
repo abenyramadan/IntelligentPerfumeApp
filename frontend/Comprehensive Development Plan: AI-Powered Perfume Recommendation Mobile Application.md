@@ -1,4 +1,4 @@
-# Comprehensive Development Plan: AI-Powered Perfume Recommendation Mobile Application
+# Comprehensive Development Plan_AI-Powered Perfume Recommendation Mobile Application
 
 ## 1. Executive Summary
 
